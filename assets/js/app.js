@@ -29,21 +29,49 @@
       failure: { Repeated: [0.41, -0.04], Residual: [0.41, -0.08], Rephrase: [0.41, -0.08], RL: [0.41, -0.09], RLT: [0.41, -0.09], Concat: [0.41, -0.09], RBF: [0.41, -0.10], 'RL² (Ours)': [0.40, -0.11] },
       success: { Repeated: [0.0380, -0.1657], Residual: [0.0454, -0.2878], Rephrase: [0.0385, -0.3243], RL: [0.0431, -0.2884], RLT: [0.0445, -0.2865], Concat: [0.0416, -0.3373], RBF: [0.0548, -0.3007], 'RL² (Ours)': [0.0468, -0.3250] }
     },
-    sim: [
-      { task: 'Move Latte Cup', base: 48.7, ours: 66.0, group: 'PolaRiS' },
-      { task: 'Spoon on Towel', base: 36, ours: 50.5, group: 'SIMPLER' },
-      { task: 'Stack Cubes', base: 28.5, ours: 40.5, group: 'SIMPLER' },
-      { task: 'Tape Measure in Basket', base: 52, ours: 59.5, group: 'SIMPLER' },
-      { task: 'Toy Dinosaur on Towel', base: 49.5, ours: 53.5, group: 'SIMPLER' },
-      { task: 'Carrot on Plate', base: 45.5, ours: 56.5, group: 'SIMPLER' }
-    ],
-    real: [
-      { task: 'Carrot on Plate', base: 36.5, ours: 63.5, group: 'In-Domain' },
-      { task: 'Cube in Toolbox', base: 40, ours: 50, group: 'In-Domain' },
-      { task: 'Tape in Toolbox', base: 36.5, ours: 53, group: 'OOD' },
-      { task: 'Screwdriver in Toolbox', base: 16.5, ours: 33.5, group: 'OOD' }
-    ]
+    gallery: {
+      ood_prompt: [
+        { task: 'Carrot on Plate', env: 'Real robot · π₀', base: 36.7, ours: 63.3,
+          rephrase: 'ood_prompt/real/carrot_on_plate/REPHRASE_s7_episode-0-success-False_RESIZED.mp4',
+          adaptive: 'ood_prompt/real/carrot_on_plate/ADAPTIVE_COMPOSE_s7_episode-0-success-True-HIGH-RES_640x480.mp4',
+          plot: 'ood_prompt/real/carrot_on_plate/SAFE.mov' },
+        { task: 'Cube in Toolbox', env: 'Real robot · π₀', base: 40, ours: 50,
+          rephrase: 'ood_prompt/real/cube_in_toolbox/REPHRASE_s0_episode-7-success-False_680x480.mp4',
+          adaptive: 'ood_prompt/real/cube_in_toolbox/ADAPTIVE_COMPOSE_s42_episode-0-success-True_640x480.mp4',
+          plot: 'ood_prompt/real/cube_in_toolbox/SAFE.mov' },
+        { task: 'Pan Cleaning', env: 'Simulation · π₀.₅', base: 24.7, ours: 33.3,
+          rephrase: 'ood_prompt/sim/pan_cleaning/PanClean_rephrase_cropped.mp4',
+          adaptive: 'ood_prompt/sim/pan_cleaning/PanClean_adaptive_compose_cropped.mp4',
+          plot: 'ood_prompt/sim/pan_cleaning/PanClean_adaptive_compose_failure_plot.mp4' },
+        { task: 'Spoon on Towel', env: 'Simulation · π₀', base: 36.0, ours: 50.7,
+          rephrase: 'ood_prompt/sim/spoon_on_towel/SpoonTowel_rephrase.mp4',
+          adaptive: 'ood_prompt/sim/spoon_on_towel/SpoonTowel_adaptive_compose.mp4',
+          plot: 'ood_prompt/sim/spoon_on_towel/SpoonTowel_adaptive_compose_failure_plot.mp4' },
+        { task: 'Stack Cubes', env: 'Simulation · π₀', base: 28.7, ours: 40.7,
+          rephrase: 'ood_prompt/sim/stack_cube/StackCubes_rephrase.mp4',
+          adaptive: 'ood_prompt/sim/stack_cube/StackCubes_adaptive_compose.mp4',
+          plot: 'ood_prompt/sim/stack_cube/StackCubes_adaptive_compose_failure_plot.mp4' }
+      ],
+      ood_env: [
+        { task: 'Toy Dinosaur on Towel', env: 'Simulation · π₀', base: 49.3, ours: 53.3,
+          rephrase: 'ood_env/sim/dino_on_towel/toyDino_rephrase.mp4',
+          composeAlways: 'ood_env/sim/dino_on_towel/toyDino_compose_alltimes.mp4',
+          adaptive: 'ood_env/sim/dino_on_towel/toyDino_compose_adaptive.mp4',
+          plot: 'ood_env/sim/dino_on_towel/toyDino_compose_adaptive_failure_plot.mp4' },
+        { task: 'Tape in Toolbox', env: 'Real robot · π₀', base: 36.7, ours: 53.3,
+          rephrase: 'ood_env/real/tape_in_toolbox/REPHRASE_s42_episode_4_success_False_raw_camera_left.mp4',
+          composeAlways: 'ood_env/real/tape_in_toolbox/COMPOSE_ALWAYS_s7_episode_0_success_False_raw_camera_left.mp4',
+          adaptive: 'ood_env/real/tape_in_toolbox/ADAPTIVE_COMPOSE_s7_episode_6_success_True_raw_camera_left_13s.mp4',
+          plot: 'ood_env/real/tape_in_toolbox/ADAPTIVE_COMPOSE_TAPE_episode_6_success_True_failure_prediction_plot (1).mp4' },
+        { task: 'Screwdriver in Toolbox', env: 'Real robot · π₀', base: 16.7, ours: 33.3,
+          rephrase: 'ood_env/real/screwdriver_in_toolbox/tape_toolbox_rephrase.mp4',
+          composeAlways: 'ood_env/real/screwdriver_in_toolbox/compose_always_screwdriver_toolbox.mp4',
+          adaptive: 'ood_env/real/screwdriver_in_toolbox/compose_adaptive_screwdriver_toolbox.mp4',
+          plot: 'ood_env/real/screwdriver_in_toolbox/SAFE_screwdriver_toolbox_crop.mp4' }
+      ]
+    }
   };
+  var GVID = 'assets/videos/';
 
   var ARCH_DUR = 4500;
   var ARCH_FRAMES = [
@@ -94,7 +122,7 @@
   var BENCH_TABS = [['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['polaris_S', 'π₀.₅ · OOD Prompt'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env']];
 
   /* ---------- state ---------- */
-  var state = { activeBench: 'pi0_indomain_ood_prompt', benchHidden: {}, scalingHidden: {}, galleryTab: 'sim', galleryFilter: 'All', grown: false, activeSection: 'overview', lineHover: null };
+  var state = { activeBench: 'pi0_indomain_ood_prompt', benchHidden: {}, scalingHidden: {}, galleryTab: 'ood_prompt', grown: false, activeSection: 'overview', lineHover: null };
 
   /* ---------- color helpers ---------- */
   function colorFor(n) { if (/adaptive/i.test(n)) return '#1A8341'; if (/compose/i.test(n)) return '#29A9DF'; if (/rephrase/i.test(n)) return '#E27B33'; if (/repeated/i.test(n)) return '#E27B33'; if (/vanilla/i.test(n)) return '#1C6488'; return '#8A8A85'; }
@@ -252,41 +280,70 @@
     var cs = $('scaling-chart-success'); clear(cs); cs.appendChild(lineChart(scalingCfg(1)));
   }
 
+  var galleryVids = [], galleryIO = null;
   function renderGallery() {
     var tab = state.galleryTab;
     var tabs = $('gallery-tabs'); clear(tabs);
-    [['sim', 'Simulation'], ['real', 'Real Robot']].forEach(function (g, i) {
+    [['ood_prompt', 'OOD Prompt'], ['ood_env', 'OOD Environment']].forEach(function (g, i) {
       var a = g[0] === tab;
-      tabs.appendChild(h('button', { onClick: function () { state.galleryTab = g[0]; state.galleryFilter = 'All'; renderGallery(); }, style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11.5px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 20px', border: 'none', borderRight: '1px solid ' + (i === 0 ? '#111111' : 'transparent'), background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111' } }, [g[1]]));
+      tabs.appendChild(h('button', { onClick: function () { state.galleryTab = g[0]; renderGallery(); }, style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11.5px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 20px', border: 'none', borderRight: '1px solid ' + (i === 0 ? '#111111' : 'transparent'), background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111' } }, [g[1]]));
     });
-    var filters = tab === 'sim' ? ['All', 'SIMPLER', 'PolaRiS'] : ['All', 'In-Domain', 'OOD'];
-    var fk = state.galleryFilter || 'All';
     var fc = $('gallery-filters'); clear(fc);
-    filters.forEach(function (f) {
-      var a = f === fk;
-      fc.appendChild(h('button', { onClick: function () { state.galleryFilter = f; renderGallery(); }, style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '10.5px', fontWeight: '500', letterSpacing: '0.04em', textTransform: 'uppercase', padding: '8px 12px', background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111', border: '1px solid #111111', borderRadius: '999px' } }, [f]));
-    });
-    var items = (tab === 'sim' ? DATA.sim : DATA.real).filter(function (it) { return fk === 'All' || it.group === fk; });
+    fc.appendChild(h('div', { style: { display: 'flex', alignItems: 'center', gap: '14px', fontFamily: "'Chakra Petch'", fontSize: '10.5px', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase', color: '#525252' } }, [
+      h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '6px' } }, [h('span', { style: { width: '10px', height: '10px', borderRadius: '3px', background: '#E27B33' } }), 'Baseline']),
+      h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '6px' } }, [h('span', { style: { width: '10px', height: '10px', borderRadius: '3px', background: '#1A8341' } }), 'RL² (Ours)'])
+    ]));
+
+    if (galleryIO) { galleryIO.disconnect(); }
+    galleryVids = [];
+    var items = DATA.gallery[tab];
     var grid = $('gallery-grid'); clear(grid);
+    grid.style.display = 'block';
     items.forEach(function (it) {
       var delta = '+' + (it.ours - it.base).toFixed(1) + '%';
-      grid.appendChild(h('div', { 'class': 'hv-card', style: { background: '#F9F9F7', border: '1px solid #111111', borderRadius: '16px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '13px' } }, [
-        h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' } }, [
+      var methods = h('div', { 'class': 'gal-methods ' + (tab === 'ood_env' ? 'env' : 'prompt') }, [
+        galGroup('Rephrase', [galTile(it.rephrase, 'Rephrase', {})]),
+        tab === 'ood_env' ? galGroup('Compose-Always', [galTile(it.composeAlways, 'Compose-Always', {})]) : null,
+        galGroup('RL² Adaptive', [galTile(it.adaptive, 'Adaptive steering', { ours: true }), galTile(it.plot, 'Failure detection', { ours: true, plot: true })], true)
+      ]);
+      grid.appendChild(h('div', { 'class': 'gal-card hv-card' }, [
+        h('div', { 'class': 'gal-head' }, [
           h('div', {}, [
-            h('div', { style: { fontFamily: "'DM Sans'", fontWeight: '700', fontSize: '15px', color: '#111111' } }, [it.task]),
-            h('div', { style: { fontFamily: "'Chakra Petch'", fontSize: '10.5px', color: '#A3A3A3', marginTop: '3px', letterSpacing: '0.06em', textTransform: 'uppercase' } }, [it.group])
+            h('div', { style: { fontFamily: "'DM Sans'", fontWeight: '700', fontSize: '16px', color: '#111111' } }, [it.task]),
+            h('div', { style: { fontFamily: "'Chakra Petch'", fontSize: '10.5px', color: '#A3A3A3', marginTop: '3px', letterSpacing: '0.06em', textTransform: 'uppercase' }, html: it.env })
           ]),
-          h('span', { style: { fontFamily: "'Chakra Petch'", fontSize: '12px', fontWeight: '600', color: '#1A8341', background: '#F9F9F7', border: '1px solid #1A8341', padding: '4px 9px', whiteSpace: 'nowrap', borderRadius: '6px' } }, [delta])
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' } }, [
+            h('span', { style: { fontFamily: "'Chakra Petch'", fontSize: '11px', color: '#525252' }, html: 'Rephrase <span style="color:#E27B33;font-weight:700">' + it.base + '%</span> &rarr; RL<sup>2</sup> <span style="color:#1A8341;font-weight:700">' + it.ours + '%</span>' }),
+            h('span', { style: { fontFamily: "'Chakra Petch'", fontSize: '12px', fontWeight: '700', color: '#1A8341', background: '#F9F9F7', border: '1px solid #1A8341', padding: '4px 9px', whiteSpace: 'nowrap', borderRadius: '6px' }, html: '&#9650; ' + delta })
+          ])
         ]),
-        h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' } }, [galleryTile('Rephrase', '#E2582C'), galleryTile('RL² Adaptive', '#1A8341')]),
-        h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontFamily: "'Chakra Petch'", fontSize: '11.5px', color: '#525252', borderTop: '1px solid #E5E5E0', paddingTop: '10px' }, html: '<span>Rephrase <span style="color:#E2582C;font-weight:700">' + it.base + '%</span></span><span>RL<sup>2</sup> <span style="color:#1A8341;font-weight:700">' + it.ours + '%</span></span>' })
+        methods
       ]));
     });
+
+    galleryIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var v = e.target;
+        if (e.isIntersecting) { if (!v.src) { v.src = v.getAttribute('data-src'); } v.play().catch(function () {}); }
+        else { v.pause(); }
+      });
+    }, { rootMargin: '250px 0px', threshold: 0.15 });
+    galleryVids.forEach(function (v) { galleryIO.observe(v); });
   }
-  function galleryTile(label, color) {
-    return h('div', { style: { position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#E5E5E5', border: '1px solid #111111', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'radial-gradient(rgba(17,17,17,0.16) 1px, transparent 1px)', backgroundSize: '8px 8px' } }, [
-      h('div', { style: { width: '0', height: '0', borderLeft: '13px solid #111111', borderTop: '9px solid transparent', borderBottom: '9px solid transparent', marginLeft: '4px' } }),
-      h('div', { style: { position: 'absolute', bottom: '10px', left: '10px', borderRadius: '6px', fontFamily: "'Chakra Petch'", fontSize: '9.5px', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase', color: '#F9F9F7', background: color, padding: '3px 7px' }, html: label.replace('²', '<sup>2</sup>') })
+  function galGroup(label, tiles, combo) {
+    return h('div', { 'class': 'gal-group' + (combo ? ' combo' : '') }, [
+      h('div', { 'class': 'gal-group-label', html: label.replace('²', '<sup>2</sup>') }),
+      h('div', { 'class': 'gal-tiles' }, tiles)
+    ]);
+  }
+  function galTile(src, tag, opts) {
+    opts = opts || {};
+    var v = h('video', { preload: 'none', 'data-src': GVID + encodeURI(src) });
+    v.muted = true; v.loop = true; v.playsInline = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('loop', '');
+    galleryVids.push(v);
+    return h('div', { 'class': 'gal-tile' + (opts.plot ? ' plot' : '') + (opts.ours ? ' ours' : '') }, [
+      v, h('div', { 'class': 'gal-tag' }, [tag])
     ]);
   }
 

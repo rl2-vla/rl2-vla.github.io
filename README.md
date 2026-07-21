@@ -3,5 +3,5 @@
 To run the server on local host
 
 ```bash
-python3 -m http.server
+python3 -m http.server 8765
 ```
