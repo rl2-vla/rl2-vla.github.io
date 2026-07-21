@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="RL2-VLA: Adaptive RL Latent Compositional Steering with Test-Time Scaling for Vision-Language-Action Models">
+<title>RL²-VLA: Adaptive RL Latent Compositional Steering with Test-Time Scaling for Vision-Language-Action Models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body id="top">
+
+<header style="position:fixed;top:0;left:0;right:0;z-index:200;height:56px;display:flex;align-items:center;background:rgba(249,249,247,0.9);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid #E2E2DC">
+  <div style="max-width:1240px;margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px">
+    <a href="#top" style="font-family:'Chakra Petch';font-weight:700;font-size:21px;letter-spacing:0.02em;color:#111111"><span style="color:#1A8341">RL</span><sup style="color:#1A8341">2</sup><span style="color:#525252">-VLA</span></a>
+    <nav style="display:flex;align-items:center">
+      <a href="#" class="hv-green" style="font-family:'Chakra Petch';font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#111111;padding:0 13px">Paper</a>
+      <a href="#" class="hv-green" style="font-family:'Chakra Petch';font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#111111;padding:0 13px;border-left:1px solid #E2E2DC">arXiv</a>
+      <a href="#" class="hv-green" style="font-family:'Chakra Petch';font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#111111;padding:0 13px;border-left:1px solid #E2E2DC">Code</a>
+      <a href="#" class="hv-green" style="font-family:'Chakra Petch';font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#111111;padding:0 13px;border-left:1px solid #E2E2DC">Video</a>
+      <a href="#bibtex" class="hv-green" style="font-family:'Chakra Petch';font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#111111;padding:0 13px;border-left:1px solid #E2E2DC">BibTeX</a>
+    </nav>
+  </div>
+</header>
+
+<aside id="side-toc" style="position:fixed;top:118px;left:clamp(20px, calc((100vw - 900px)/2 - 172px), 480px);width:150px;z-index:150">
+  <nav id="toc-nav"></nav>
+</aside>
+
+<main style="max-width:900px;margin:0 auto;padding:0 32px">
+
+<section id="overview" data-sec="overview" class="rev" style="position:relative;padding:104px 0 76px">
+  <div aria-hidden="true" style="position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);background:#F2F0EF;z-index:-1"></div>
+  <div style="text-align:center">
+    <h1 style="font-family:'DM Sans';font-weight:800;font-size:clamp(34px,5.4vw,62px);line-height:1.02;letter-spacing:-1px;margin:30px auto 0;max-width:900px;color:#111111;text-wrap:balance">
+      <span style="color:#1A8341">RL<sup>2</sup></span><span style="color:#525252">-VLA</span>: Adaptive RL Latent Compositional Steering with Test-Time Scaling for Vision-Language-Action Models
+    </h1>
+    <div style="width:44px;height:2px;background:#1A8341;margin:24px auto 22px"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:center;font-family:'DM Sans';font-size:16px;color:#222222">
+      <span><a href="https://www.derektanmingsiang.com/" target="_blank" rel="noopener" class="hv-green" style="color:inherit">Derek Ming Siang Tan</a><sup style="color:#1A8341">1,3,&dagger;</sup></span>
+      <span><a href="https://shailes-h.github.io/" target="_blank" rel="noopener" class="hv-green" style="color:inherit">Shailesh Shailesh</a><sup style="color:#1A8341">1,&dagger;</sup></span>
+      <span><a href="https://scholar.google.com/citations?user=gHmg-iwAAAAJ&hl=en" target="_blank" rel="noopener" class="hv-green" style="color:inherit">Srikrishna Iyer</a><sup style="color:#1A8341">3</sup></span>
+      <span><a href="https://www.linkedin.com/in/willteo/" target="_blank" rel="noopener" class="hv-green" style="color:inherit">William Wei Jie Teo</a><sup style="color:#1A8341">1,3</sup></span>
+      <span><a href="#" class="hv-green" style="color:inherit">Yuanliang Ju</a><sup style="color:#1A8341">2</sup></span>
+      <span style="flex-basis:100%;height:0"></span>
+      <span><a href="#" class="hv-green" style="color:inherit">Qiao Gu</a><sup style="color:#1A8341">2</sup></span>
+      <span><a href="https://www.marmotlab.org/bio.html" target="_blank" rel="noopener" class="hv-green" style="color:inherit">Guillaume Sartoretti</a><sup style="color:#1A8341">1</sup></span>
+    </div>
+    <div style="margin-top:11px;font-family:'Chakra Petch';font-size:12.5px;letter-spacing:0.02em;color:#525252">
+      <sup style="color:#1A8341">1</sup> National University of Singapore &nbsp;&middot;&nbsp; <sup style="color:#1A8341">2</sup> University of Toronto &nbsp;&middot;&nbsp; <sup style="color:#1A8341">3</sup> Singapore Technologies Engineering
+    </div>
+    <div style="margin-top:6px;font-family:'Chakra Petch';font-size:11.5px;color:#A3A3A3">&dagger; Equal contribution</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:11px;margin-top:24px">
+      <a href="#" target="_blank" rel="noopener" class="hv-invert" style="display:inline-flex;align-items:center;gap:8px;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:11px 18px;background:#111111;color:#F9F9F7;border:1px solid #111111;border-radius:9px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line></svg>Paper</a>
+      <a href="#" target="_blank" rel="noopener" class="hv-invert" style="display:inline-flex;align-items:center;gap:8px;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:11px 18px;background:#F9F9F7;color:#111111;border:1px solid #111111;border-radius:9px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"></path><polyline points="8 8 12 4 16 8"></polyline><line x1="12" y1="4" x2="12" y2="16"></line></svg>arXiv</a>
+      <a href="#" target="_blank" rel="noopener" class="hv-invert" style="display:inline-flex;align-items:center;gap:8px;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:11px 18px;background:#F9F9F7;color:#111111;border:1px solid #111111;border-radius:9px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>Code</a>
+      <a href="#" target="_blank" rel="noopener" class="hv-invert" style="display:inline-flex;align-items:center;gap:8px;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:11px 18px;background:#F9F9F7;color:#111111;border:1px solid #111111;border-radius:9px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>Video</a>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:30px 46px;margin-top:28px">
+      <img src="assets/images/logo_nus.png" alt="National University of Singapore" style="height:65px;width:auto;object-fit:contain"/>
+      <img src="assets/images/logo_toronto.png" alt="University of Toronto" style="height:55px;width:auto;object-fit:contain"/>
+      <img src="assets/images/logo_stengg.png" alt="Singapore Technologies Engineering" style="height:33px;width:auto;object-fit:contain"/>
+    </div>
+  </div>
+
+  <figure style="margin:44px 0 0">
+    <div style="position:relative;aspect-ratio:4000/1990;overflow:hidden;background:#FFFFFF;border:1px solid #111111;border-radius:16px">
+      <img src="assets/images/fig1_overview.png" alt="Overview of RL2: test-time action error scaling law and real-robot compositional steering" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain"/>
+    </div>
+    <figcaption style="font-family:'DM Sans';text-align:center;font-size:14.5px;color:#525252;margin:15px auto 0;max-width:740px;line-height:1.6"><span style="font-family:'Chakra Petch';font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#111111">Fig. 1 &mdash; </span><strong style="color:#111111;font-weight:700">Overview of RL<sup>2</sup>.</strong> RL<sup>2</sup> relies on accurate VLA samples to approach the object, then composes RL steering to diversify actions toward success &mdash; activated only when failure is preemptively detected.</figcaption>
+  </figure>
+
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:#E2E2DC;border:1px solid #E2E2DC;margin-top:30px;border-radius:14px;overflow:hidden">
+    <div style="background:#F9F9F7;padding:14px 12px"><div style="font-family:'Chakra Petch';font-weight:700;font-size:clamp(16px,1.9vw,21px);letter-spacing:-0.5px;line-height:1;color:#1A8341">15</div><div style="font-family:'DM Sans';font-size:11px;color:#111111;margin-top:7px;font-weight:600;line-height:1.25">Manipulation tasks</div><div style="font-family:'Chakra Petch';font-size:9px;color:#737373;margin-top:3px;line-height:1.3;letter-spacing:0.02em">across 3 benchmarks</div></div>
+    <div style="background:#F9F9F7;padding:14px 12px"><div style="font-family:'Chakra Petch';font-weight:700;font-size:clamp(16px,1.9vw,21px);letter-spacing:-0.5px;line-height:1;color:#1A8341">+10.1%</div><div style="font-family:'DM Sans';font-size:11px;color:#111111;margin-top:7px;font-weight:600;line-height:1.25">Avg success &middot; SIMPLER</div><div style="font-family:'Chakra Petch';font-size:9px;color:#737373;margin-top:3px;line-height:1.3;letter-spacing:0.02em">&pi;<sub>0</sub>, OOD language prompts</div></div>
+    <div style="background:#F9F9F7;padding:14px 12px"><div style="font-family:'Chakra Petch';font-weight:700;font-size:clamp(16px,1.9vw,21px);letter-spacing:-0.5px;line-height:1;color:#1A8341">+10.9%</div><div style="font-family:'DM Sans';font-size:11px;color:#111111;margin-top:7px;font-weight:600;line-height:1.25">Avg success &middot; PolaRiS</div><div style="font-family:'Chakra Petch';font-size:9px;color:#737373;margin-top:3px;line-height:1.3;letter-spacing:0.02em">&pi;<sub>0.5</sub>, OOD prompts</div></div>
+    <div style="background:#F9F9F7;padding:14px 12px"><div style="font-family:'Chakra Petch';font-weight:700;font-size:clamp(16px,1.9vw,21px);letter-spacing:-0.5px;line-height:1;color:#1A8341">+17.5%</div><div style="font-family:'DM Sans';font-size:11px;color:#111111;margin-top:7px;font-weight:600;line-height:1.25">Avg success &middot; Real robot</div><div style="font-family:'Chakra Petch';font-size:9px;color:#737373;margin-top:3px;line-height:1.3;letter-spacing:0.02em">PiperX, over Rephrase</div></div>
+    <div style="background:#F9F9F7;padding:14px 12px"><div style="font-family:'Chakra Petch';font-weight:700;font-size:clamp(16px,1.9vw,21px);letter-spacing:-0.5px;line-height:1;color:#1A8341">+18.7%</div><div style="font-family:'DM Sans';font-size:11px;color:#111111;margin-top:7px;font-weight:600;line-height:1.25">Scaling samples + diversity</div><div style="font-family:'Chakra Petch';font-size:9px;color:#737373;margin-top:3px;line-height:1.3;letter-spacing:0.02em">combined test-time scaling</div></div>
+    <div style="background:#F9F9F7;padding:14px 12px"><div style="font-family:'Chakra Petch';font-weight:700;font-size:clamp(16px,1.9vw,21px);letter-spacing:-0.5px;line-height:1;color:#1A8341">&le;2 ms</div><div style="font-family:'DM Sans';font-size:11px;color:#111111;margin-top:7px;font-weight:600;line-height:1.25">SAFE detector / batch</div><div style="font-family:'Chakra Petch';font-size:9px;color:#737373;margin-top:3px;line-height:1.3;letter-spacing:0.02em">vs &pi;<sub>0</sub> up to 3093 ms</div></div>
+  </div>
+
+  <div style="display:flex;justify-content:center;margin-top:26px">
+    <a href="#abstract" class="hv-green" style="display:flex;flex-direction:column;align-items:center;gap:5px;font-family:'Chakra Petch';font-size:10px;font-weight:600;letter-spacing:0.2em;color:#A3A3A3">SCROLL
+      <span style="display:inline-block;animation:rl2bob 1.8s ease-in-out infinite">&#9661;</span>
+    </a>
+  </div>
+</section>
+
+<section id="abstract" data-sec="abstract" class="rev" style="position:relative;padding:72px 0">
+  <div aria-hidden="true" style="position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);background:#EFF2F2;z-index:-1"></div>
+  <div style="margin-bottom:14px"><div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#1A8341">Abstract</div></div>
+  <p style="font-family:'DM Sans';font-size:18px;line-height:1.68;color:#222222;margin:0;text-wrap:pretty">
+    Despite the impressive visuomotor capabilities of Vision-Language-Action (VLA) models, their performance often degrades on challenging and out-of-domain tasks. We introduce <span style="color:#1A8341;font-weight:600">RL<sup>2</sup></span>, an adaptive inference-time steering framework that leverages Reinforcement Learning on VLA Latents. We train a lightweight offline RL policy conditioned on expressive latents from the VLA action expert and <span style="color:#111111;font-weight:600">compose its flow velocity with that of the frozen VLA</span> during inference. We further discover that inference-time steering follows fundamentally different scaling laws under success and failure states &mdash; <span style="color:#111111;font-weight:600">action diversity is most beneficial when the base VLA is likely to fail</span> &mdash; so RL<sup>2</sup> activates compositional steering only when failure is predicted. Across the SIMPLER and PolaRiS benchmarks, RL<sup>2</sup> improves success rates by up to <span style="color:#1A8341;font-weight:600">+17.3%</span>, and real-world experiments confirm the gains transfer beyond simulation.
+  </p>
+</section>
+
+<section id="demo" data-sec="demo" class="rev" style="position:relative;padding:72px 0">
+  <div aria-hidden="true" style="position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);background:#F2F0EF;z-index:-1"></div>
+  <div style="margin-bottom:14px">
+    <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#1A8341">RL<sup>2</sup> in Action</div>
+    <h2 style="font-family:'DM Sans';font-weight:700;font-size:clamp(24px,3vw,33px);letter-spacing:-0.01em;line-height:1.14;margin:6px 0 0;color:#111111">SAFE detection meets compositional steering</h2>
+  </div>
+  <p style="font-family:'DM Sans';font-size:18px;line-height:1.7;color:#404040;max-width:720px;margin:15px 0 0">Watch the baselines struggle, then RL<sup>2</sup> take over. The <strong style="color:#111111">failure&#8209;detection</strong> panel shows exactly when the conformal (CP) band is crossed and compositional steering kicks in &mdash; step through the numbered keypoints to follow the closed loop.</p>
+
+  <figure style="margin:26px 0 0" data-demo-fig>
+    <div style="background:#F9F9F7;border:1px solid #111111;border-radius:16px;padding:18px 18px 20px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 14px;padding-bottom:14px;border-bottom:1px solid #E5E5E0">
+        <div>
+          <div id="demo-ex-eyebrow" style="font-family:'Chakra Petch';font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#1A8341"></div>
+          <div id="demo-ex-title" style="font-family:'DM Sans';font-weight:700;font-size:clamp(18px,2.1vw,22px);color:#111111;margin-top:2px"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button id="demo-prev" class="hv-invert" aria-label="Previous example" style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#F9F9F7;border:1px solid #111111;color:#111111;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+          <div id="demo-counter" style="min-width:64px;text-align:center;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.06em;color:#525252"></div>
+          <button id="demo-next" class="hv-invert" aria-label="Next example" style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#F9F9F7;border:1px solid #111111;color:#111111;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+        </div>
+      </div>
+
+      <div id="demo-stage" style="margin-top:16px;position:relative"></div>
+
+      <div style="display:flex;align-items:center;gap:14px;margin-top:16px">
+        <button id="demo-play" aria-label="Play or pause" style="flex:none;cursor:pointer;width:40px;height:40px;border-radius:50%;background:#111111;border:none;color:#F9F9F7;display:flex;align-items:center;justify-content:center;padding:0">
+          <svg id="demo-play-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display:none;margin-left:2px"><path d="M8 5v14l11-7z"></path></svg>
+          <svg id="demo-pause-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display:block"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg>
+        </button>
+        <div id="demo-track" style="position:relative;flex:1;height:8px;border-radius:6px;background:#E2E2DC;cursor:pointer">
+          <div id="demo-fill" style="position:absolute;left:0;top:0;bottom:0;width:0%;border-radius:6px;background:#111111"></div>
+        </div>
+        <div id="demo-time" style="flex:none;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.04em;color:#525252;min-width:76px;text-align:right">0:00 / 0:00</div>
+      </div>
+
+      <div id="demo-dots" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px"></div>
+    </div>
+  </figure>
+</section>
+
+<section id="method" data-sec="method" class="rev" style="position:relative;padding:72px 0">
+  <div aria-hidden="true" style="position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);background:#EFF2F2;z-index:-1"></div>
+  <div style="margin-bottom:14px">
+    <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#1A8341">Method</div>
+    <h2 style="font-family:'DM Sans';font-weight:700;font-size:clamp(24px,3vw,33px);letter-spacing:-0.01em;line-height:1.14;margin:6px 0 0;color:#111111">Overall architecture</h2>
+  </div>
+  <figure style="margin:26px 0 0">
+    <div style="border:1px solid #111111;border-radius:16px;overflow:hidden;background:#F9F9F7">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:#111111;padding:9px 15px">
+        <div style="display:flex;align-items:center;gap:13px">
+          <div id="arch-counter" style="font-family:'Chakra Petch';font-size:10.5px;letter-spacing:0.08em;color:#A3A3A3">1 / 4</div>
+          <button id="arch-pause" aria-label="Play or pause animation" style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:50%;background:#F9F9F7;border:none;color:#111111;padding:0"></button>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;padding:16px 20px 6px">
+        <div id="arch-frames" style="position:relative;width:100%;aspect-ratio:960/341"></div>
+      </div>
+      <div id="arch-caption" style="min-height:66px;padding:8px 22px 14px;text-align:center;border-bottom:1px solid #EDEDE7"></div>
+      <div id="arch-steps" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px 16px"></div>
+    </div>
+    <figcaption style="font-family:'DM Sans';text-align:center;font-size:14px;color:#525252;margin:14px auto 0;max-width:740px;line-height:1.6"><span style="font-family:'Chakra Petch';font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#111111">Fig. 5 &mdash; </span><strong style="color:#111111;font-weight:700">The RL<sup>2</sup> pipeline.</strong> RL<sup>2</sup> keeps failure prediction and action steering in one closed loop: the VLA acts, SAFE watches its latents, and compositional steering kicks in exactly when the base policy is about to fail.</figcaption>
+  </figure>
+</section>
+
+<section id="results" data-sec="results" class="rev" style="position:relative;padding:76px 0">
+  <div aria-hidden="true" style="position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);background:#F2F0EF;z-index:-1"></div>
+  <div style="margin-bottom:14px">
+    <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#1A8341">Results</div>
+    <h2 style="font-family:'DM Sans';font-weight:700;font-size:clamp(24px,3vw,33px);letter-spacing:-0.01em;line-height:1.14;margin:6px 0 0;color:#111111">Consistent gains across simulation and hardware</h2>
+  </div>
+  <div style="margin:22px 0 0">
+    <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#1A8341">Key Insight</div>
+    <blockquote style="position:relative;font-family:'DM Sans';font-style:italic;font-weight:500;font-size:clamp(20px,2.6vw,27px);line-height:1.38;color:#111111;margin:14px 0 0;padding:0 0 0 54px;max-width:820px;text-wrap:pretty"><span aria-hidden="true" style="position:absolute;left:0;top:-14px;font-family:'DM Sans';font-style:italic;font-weight:700;font-size:74px;line-height:1;color:#1A8341">&ldquo;</span>Diversification is most useful during failure <span style="font-style:normal;font-size:0.68em;color:#525252">(e.g. RBF, RL<sup>2</sup> Steering, etc.)</span> &mdash; however, it may degrade already-accurate actions during success.</blockquote>
+
+    <div style="margin-top:16px">
+      <div style="background:#F9F9F7;border:1px solid #111111;border-radius:12px;padding:20px 20px 16px">
+        <div style="font-family:'DM Sans';font-weight:700;font-size:22px;color:#111111">Test-time scaling laws</div>
+        <div style="font-family:'Chakra Petch';font-size:11.5px;color:#525252;margin-top:4px;letter-spacing:0.02em">Fitted power law <em>e</em> &asymp; a&middot;k<sup>b</sup> &middot; oracle action error vs. action samples (k)</div>
+        <div id="scaling-legend" style="display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 2px;padding-top:12px;border-top:1px solid #E5E5E0"></div>
+        <div style="display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px">
+          <div>
+            <div style="display:flex;align-items:center;gap:7px;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#111111"><span aria-hidden="true" style="color:#111111">&#9670;</span>Failure states</div>
+            <div id="scaling-chart-failure" style="max-width:660px;margin:2px auto 0"></div>
+          </div>
+          <div style="border-top:1px solid #E5E5E0;padding-top:12px">
+            <div style="display:flex;align-items:center;gap:7px;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1A8341"><span aria-hidden="true" style="color:#1A8341">&#9670;</span>Success states</div>
+            <div id="scaling-chart-success" style="max-width:660px;margin:2px auto 0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-family:'DM Sans';text-align:center;font-size:13px;color:#737373;margin:14px auto 0;max-width:760px;line-height:1.55"><span style="font-family:'Chakra Petch';font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:#111111">Fig. &mdash; </span>Test-Time Scaling analysis using oracle verifier &amp; &pi;<sub>0</sub> (BridgeV2 Dataset). Compare the panels: RL<sup>2</sup> (green) drives error <strong style="color:#111111">lowest during failure</strong> yet stays <strong style="color:#111111">high during success</strong> &mdash; motivating adaptive, gated steering.</p>
+  </div>
+
+  <div style="margin-top:44px">
+    <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#1A8341">Key Insight</div>
+    <blockquote style="position:relative;font-family:'DM Sans';font-style:italic;font-weight:500;font-size:clamp(20px,2.6vw,27px);line-height:1.38;color:#111111;margin:14px 0 0;padding:0 0 0 54px;max-width:820px;text-wrap:pretty"><span aria-hidden="true" style="position:absolute;left:0;top:-14px;font-family:'DM Sans';font-style:italic;font-weight:700;font-size:74px;line-height:1;color:#1A8341">&ldquo;</span>Steering helps most exactly where the base VLA struggles. On out-of-domain prompts and environments, adaptive RL<sup>2</sup> lifts &pi;<sub>0</sub> by up to <span style="font-style:normal;color:#1A8341;font-weight:700">+14.7%</span> task-wise; on hardware it beats the Rephrase baseline by <span style="font-style:normal;color:#1A8341;font-weight:700">+17.5%</span> on average.</blockquote>
+  </div>
+
+  <div style="background:#F9F9F7;border:1px solid #111111;border-radius:16px;padding:22px 22px 26px;margin-top:26px">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid #111111;padding-bottom:16px">
+      <div>
+        <div style="font-family:'DM Sans';font-weight:700;font-size:22px;color:#111111">Benchmark results</div>
+        <div style="font-family:'Chakra Petch';font-size:11.5px;color:#525252;margin-top:4px;letter-spacing:0.02em"><span id="bench-title"></span> &middot; success rate (%)</div>
+      </div>
+      <div id="bench-tabs" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+    <div id="bench-series" style="display:flex;flex-wrap:wrap;gap:8px 18px;margin:18px 0 4px"></div>
+    <div id="bench-chart" style="margin-top:6px"></div>
+  </div>
+</section>
+
+<section id="gallery" data-sec="gallery" class="rev" style="position:relative;padding:76px 0">
+  <div aria-hidden="true" style="position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);background:#EFF2F2;z-index:-1"></div>
+  <div style="margin-bottom:14px">
+    <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#1A8341">Task Gallery</div>
+    <h2 style="font-family:'DM Sans';font-weight:700;font-size:clamp(24px,3vw,33px);letter-spacing:-0.01em;line-height:1.14;margin:6px 0 0;color:#111111">Baseline vs. RL<sup>2</sup>, side by side</h2>
+  </div>
+  <p style="font-family:'DM Sans';font-size:18px;line-height:1.7;color:#404040;max-width:720px;margin:15px 0 0">Each card pairs the strongest baseline (Rephrase) with adaptive RL<sup>2</sup> on the same task. The badge shows the success-rate gain. Video placeholders will be replaced with our supplementary rollouts.</p>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:24px">
+    <div id="gallery-tabs" style="display:inline-flex;border:1px solid #111111;border-radius:8px;overflow:hidden"></div>
+    <div id="gallery-filters" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  </div>
+  <div id="gallery-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:20px"></div>
+</section>
+
+<section id="bibtex" data-sec="bibtex" class="rev" style="position:relative;padding:72px 0">
+  <div aria-hidden="true" style="position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);background:#F2F0EF;z-index:-1"></div>
+  <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+    <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#1A8341">BibTeX</div>
+    <button id="copy-btn" class="hv-invert" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:10px 15px;background:#F9F9F7;color:#111111;border:1px solid #111111;border-radius:8px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="0" ry="0"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span id="copy-label">Copy</span></button>
+  </div>
+  <div style="background:#F3F3ED;border:1px solid #E2E2DC;border-radius:12px;padding:20px 22px;overflow-x:auto">
+    <pre id="bibtex-pre" style="font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;font-size:12.5px;line-height:1.75;color:#1A1A1A;white-space:pre"></pre>
+  </div>
+  <div style="margin-top:36px">
+    <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#111111;border-bottom:1px solid #111111;padding-bottom:8px">Acknowledgments</div>
+    <p style="font-family:'DM Sans';font-size:15px;line-height:1.7;color:#404040;margin:14px 0 0;text-align:justify;hyphens:auto">We thank our collaborators across the National University of Singapore, the University of Toronto, and Singapore Technologies Engineering for their support with robot infrastructure, experimental equipment, and helpful discussions. We are grateful to the open-source community behind SIMPLER, PolaRiS, SAFE, and &pi;<sub>0</sub> for making this research possible.</p>
+  </div>
+</section>
+
+<footer data-sec="footer" class="rev" style="position:relative;padding:44px 0 36px">
+  <div aria-hidden="true" style="position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);background:#EFF2F2;z-index:-1"></div>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px">
+    <div style="font-family:'Chakra Petch';font-weight:700;font-size:19px;color:#111111">RL<sup style="color:#1A8341">2</sup></div>
+    <div style="display:flex;gap:0;font-family:'Chakra Petch';font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em">
+      <a href="#" class="hv-green" style="padding:0 12px">Paper</a>
+      <a href="#" class="hv-green" style="padding:0 12px;border-left:1px solid #E2E2DC">arXiv</a>
+      <a href="#" class="hv-green" style="padding:0 12px;border-left:1px solid #E2E2DC">Code</a>
+      <a href="#bibtex" class="hv-green" style="padding:0 12px;border-left:1px solid #E2E2DC">BibTeX</a>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<div id="tooltip" style="position:fixed;z-index:999;pointer-events:none;display:none;background:#F9F9F7;border:1px solid #111111;border-radius:10px;padding:10px 12px;box-shadow:0 8px 24px rgba(17,17,17,0.14);min-width:150px">
+  <div id="tooltip-title" style="font-family:'Chakra Petch';font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#737373;margin-bottom:8px;border-bottom:1px solid #E5E5E0;padding-bottom:6px"></div>
+  <div id="tooltip-rows"></div>
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
