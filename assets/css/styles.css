@@ -9,6 +9,7 @@ sub{font-size:0.66em}
 pre{margin:0}
 
 @keyframes rl2bob{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(6px);opacity:.85}}
+@keyframes rl2wheel{0%{transform:translateY(0);opacity:0}25%{opacity:1}75%{opacity:1}100%{transform:translateY(9px);opacity:0}}
 @keyframes archfill{from{width:0%}to{width:100%}}
 @keyframes rl2spin{to{transform:rotate(360deg)}}
 @keyframes archcapin{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}

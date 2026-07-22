@@ -294,6 +294,16 @@
       h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '6px' } }, [h('span', { style: { width: '10px', height: '10px', borderRadius: '3px', background: '#1A8341' } }), 'RL² (Ours)'])
     ]));
 
+    var INSIGHT = {
+      ood_prompt: 'On out-of-domain prompts, adaptive steering pre-empts failure and <strong style="color:#111111;font-style:normal">replans on the fly</strong> &mdash; recovering task success where the frozen VLA stalls.',
+      ood_env: 'In out-of-domain environments, adaptive steering <strong style="color:#111111;font-style:normal">diversifies actions to reject distractors and unfamiliar objects</strong> (e.g. lifting the tape clear of clutter) &mdash; where the base VLA gets stuck.'
+    };
+    var ins = $('gallery-insight'); clear(ins);
+    ins.appendChild(h('div', { style: { margin: '26px 0 4px' } }, [
+      h('div', { style: { fontFamily: "'Chakra Petch'", fontSize: '11px', fontWeight: '600', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#1A8341' } }, ['Key Insight']),
+      h('blockquote', { style: { position: 'relative', fontFamily: "'DM Sans'", fontStyle: 'italic', fontWeight: '500', fontSize: 'clamp(18px,2.3vw,24px)', lineHeight: '1.4', color: '#111111', margin: '14px 0 0', padding: '0 0 0 54px', maxWidth: '820px', textWrap: 'pretty' }, html: '<span aria-hidden="true" style="position:absolute;left:0;top:-14px;font-family:\'DM Sans\';font-style:italic;font-weight:700;font-size:74px;line-height:1;color:#1A8341">&ldquo;</span>' + INSIGHT[tab] })
+    ]));
+
     if (galleryIO) { galleryIO.disconnect(); }
     galleryVids = [];
     var items = DATA.gallery[tab];
@@ -603,6 +613,23 @@
     } catch (e) {}
   }
 
+  /* ---------- scroll-down cue at the bottom of every section ---------- */
+  var CUE_SVG = '<svg width="27" height="42" viewBox="0 0 27 42" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+    + '<rect x="2" y="2" width="23" height="38" rx="11.5"></rect>'
+    + '<circle cx="13.5" cy="11" r="2" fill="currentColor" stroke="none" style="animation:rl2wheel 1.8s ease-in-out infinite"></circle></svg>'
+    + '<svg width="26" height="20" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:rl2bob 1.8s ease-in-out infinite">'
+    + '<polyline points="5 3 13 10 21 3"></polyline><polyline points="5 10 13 17 21 10"></polyline></svg>';
+  function initScrollCues() {
+    var ids = TOC.map(function (t) { return t[0]; });
+    for (var i = 0; i < ids.length - 1; i++) {
+      var sec = $(ids[i]); if (!sec) continue;
+      var wrap = h('div', { style: { display: 'flex', justifyContent: 'center', marginTop: '34px' } }, [
+        h('a', { href: '#' + ids[i + 1], 'class': 'hv-green', 'aria-label': 'Scroll down for more', style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '7px', color: '#A3A3A3' }, html: CUE_SVG })
+      ]);
+      sec.appendChild(wrap);
+    }
+  }
+
   /* ---------- boot ---------- */
   function init() {
     TT.box = $('tooltip'); TT.title = $('tooltip-title'); TT.rows = $('tooltip-rows');
@@ -615,6 +642,7 @@
     initBibtex();
     initDemo();
     initObservers();
+    initScrollCues();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
