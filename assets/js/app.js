@@ -26,7 +26,7 @@
         std: { 'Tape in Toolbox': [11.5, 15.3, 5.8, 5.8], 'Screwdriver in Toolbox': [5.8, 5.8, 10.0, 5.8], 'Average': [8.7, 10.6, 7.9, 5.8] } }
     },
     scaling: {
-      failure: { Repeated: [0.41, -0.04], Residual: [0.41, -0.08], Rephrase: [0.41, -0.08], RL: [0.41, -0.09], RLT: [0.41, -0.09], Concat: [0.41, -0.09], RBF: [0.41, -0.10], 'RL² (Ours)': [0.40, -0.11] },
+      failure: { Repeated: [0.4099, -0.0438], Residual: [0.4051, -0.0814], Rephrase: [0.4073, -0.0829], RL: [0.4099, -0.0858], RLT: [0.4111, -0.0867], Concat: [0.4116, -0.0882], RBF: [0.4147, -0.0988], 'RL² (Ours)': [0.3983, -0.1081] },
       success: { Repeated: [0.0380, -0.1657], Residual: [0.0454, -0.2878], Rephrase: [0.0385, -0.3243], RL: [0.0431, -0.2884], RLT: [0.0445, -0.2865], Concat: [0.0416, -0.3373], RBF: [0.0548, -0.3007], 'RL² (Ours)': [0.0468, -0.3250] }
     },
     gallery: {
@@ -126,8 +126,8 @@
 
   /* ---------- color helpers ---------- */
   function colorFor(n) { if (/adaptive/i.test(n)) return '#1A8341'; if (/compose/i.test(n)) return '#29A9DF'; if (/rephrase/i.test(n)) return '#E27B33'; if (/repeated/i.test(n)) return '#E27B33'; if (/vanilla/i.test(n)) return '#1C6488'; return '#8A8A85'; }
-  function scaleColor(n) { if (/ours/i.test(n)) return '#1A8341'; if (n === 'Rephrase') return '#E2582C'; return { Repeated: '#C8C8C4', Residual: '#A3A3A3', RL: '#6E6E68', RLT: '#525252', Concat: '#404040', RBF: '#222222' }[n] || '#8A8A85'; }
-  function scaleDash(n) { return (n === 'Concat' || n === 'Residual') ? '6 4' : '0'; }
+  function scaleColor(n) { if (/ours/i.test(n)) return '#1B7A1B'; return { Repeated: '#1565C0', Residual: '#808080', Rephrase: '#DB4800', RL: '#CBB703', RLT: '#6A1B9A', Concat: '#217ACB', RBF: '#9E6651' }[n] || '#8A8A85'; }
+  function scaleDash(n) { return (n === 'Concat' || n === 'Residual' || n === 'RL') ? '6 4' : '0'; }
 
   /* ---------- dom helpers ---------- */
   var SVG_ATTR = { strokeWidth: 'stroke-width', strokeDasharray: 'stroke-dasharray', strokeLinecap: 'stroke-linecap', strokeLinejoin: 'stroke-linejoin', textAnchor: 'text-anchor', fontSize: 'font-size', fontFamily: 'font-family', fontWeight: 'font-weight' };
@@ -272,7 +272,7 @@
     var legend = $('scaling-legend'); clear(legend);
     Object.keys(DATA.scaling.failure).forEach(function (n) {
       legend.appendChild(h('button', { onClick: function () { state.scalingHidden[n] = !state.scalingHidden[n]; renderScaling(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px', background: 'none', border: 'none', padding: '2px 0', opacity: state.scalingHidden[n] ? '0.34' : '1' } }, [
-        h('span', { style: { width: '16px', height: '3px', background: scaleColor(n) } }),
+        h('span', { style: { width: '16px', height: '3px', background: scaleDash(n) !== '0' ? 'repeating-linear-gradient(90deg,' + scaleColor(n) + ' 0 4px,transparent 4px 7px)' : scaleColor(n) } }),
         h('span', { style: { fontFamily: "'Chakra Petch'", fontSize: '11.5px', color: '#222222' } }, [n])
       ]));
     });
