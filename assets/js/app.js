@@ -53,21 +53,21 @@
           plot: 'ood_prompt/sim/stack_cube/StackCubes_adaptive_compose_failure_plot.mp4' }
       ],
       ood_env: [
-        { task: 'Toy Dinosaur on Towel', env: 'Simulation · π₀', base: 49.3, ours: 53.3,
+        { task: 'Toy Dinosaur on Towel', env: 'Simulation · π₀', base: 49.3, ours: 53.3, compose: 46,
           rephrase: 'ood_env/sim/dino_on_towel/toyDino_rephrase.mp4',
           composeAlways: 'ood_env/sim/dino_on_towel/toyDino_compose_alltimes.mp4',
           adaptive: 'ood_env/sim/dino_on_towel/toyDino_compose_adaptive.mp4',
           plot: 'ood_env/sim/dino_on_towel/toyDino_compose_adaptive_failure_plot.mp4' },
-        { task: 'Tape in Toolbox', env: 'Real robot · π₀', base: 36.7, ours: 53.3,
+        { task: 'Tape in Toolbox', env: 'Real robot · π₀', base: 36.7, ours: 53.3, compose: 33.3,
           rephrase: 'ood_env/real/tape_in_toolbox/REPHRASE_s42_episode_4_success_False_raw_camera_left.mp4',
           composeAlways: 'ood_env/real/tape_in_toolbox/COMPOSE_ALWAYS_s7_episode_0_success_False_raw_camera_left.mp4',
           adaptive: 'ood_env/real/tape_in_toolbox/ADAPTIVE_COMPOSE_s7_episode_6_success_True_raw_camera_left_13s.mp4',
           plot: 'ood_env/real/tape_in_toolbox/ADAPTIVE_COMPOSE_TAPE_episode_6_success_True_failure_prediction_plot (1).mp4' },
-        { task: 'Screwdriver in Toolbox', env: 'Real robot · π₀', base: 16.7, ours: 33.3,
-          rephrase: 'ood_env/real/screwdriver_in_toolbox/tape_toolbox_rephrase.mp4',
-          composeAlways: 'ood_env/real/screwdriver_in_toolbox/compose_always_screwdriver_toolbox.mp4',
-          adaptive: 'ood_env/real/screwdriver_in_toolbox/compose_adaptive_screwdriver_toolbox.mp4',
-          plot: 'ood_env/real/screwdriver_in_toolbox/SAFE_screwdriver_toolbox_crop.mp4' }
+        { task: 'Screwdriver in Toolbox', env: 'Real robot · π₀', base: 16.7, ours: 33.3, compose: 20,
+          rephrase: 'ood_env/real/screwdriver_in_toolbox_new/REPHRASE_Screwdriver_in_Toolbox_speedx5.mp4',
+          composeAlways: 'ood_env/real/screwdriver_in_toolbox_new/COMPOSE_ALWAYS_Screwdriver_in_Toolbox_speedx5.mp4',
+          adaptive: 'ood_env/real/screwdriver_in_toolbox_new/ADAPTIVE_COMPOSE_Screwdriver_in_Toolbox_speedx5.mp4',
+          plot: 'ood_env/real/screwdriver_in_toolbox_new/CP_ADAPTIVE_COMPOSE_Screwdriver_in_Toolbox_speedx5.mp4' }
       ]
     }
   };
@@ -280,7 +280,15 @@
     var cs = $('scaling-chart-success'); clear(cs); cs.appendChild(lineChart(scalingCfg(1)));
   }
 
-  var galleryVids = [], galleryIO = null;
+  var galleryVids = [], galleryIO = null, galleryTimer = null;
+  function galleryInView() { var g = $('gallery'); if (!g) return false; var r = g.getBoundingClientRect(), vh = window.innerHeight || 800; return r.bottom > vh * 0.15 && r.top < vh * 0.85; }
+  function scheduleGalleryAuto() {
+    clearTimeout(galleryTimer);
+    galleryTimer = setTimeout(function () {
+      if (galleryInView()) { state.galleryTab = (state.galleryTab === 'ood_prompt') ? 'ood_env' : 'ood_prompt'; renderGallery(); }
+      else scheduleGalleryAuto();
+    }, 12000);
+  }
   function renderGallery() {
     var tab = state.galleryTab;
     var tabs = $('gallery-tabs'); clear(tabs);
@@ -310,7 +318,6 @@
     var grid = $('gallery-grid'); clear(grid);
     grid.style.display = 'block';
     items.forEach(function (it) {
-      var delta = '+' + (it.ours - it.base).toFixed(1) + '%';
       var methods = h('div', { 'class': 'gal-methods ' + (tab === 'ood_env' ? 'env' : 'prompt') }, [
         galGroup('Rephrase', [galTile(it.rephrase, 'Rephrase', {})]),
         tab === 'ood_env' ? galGroup('Compose-Always', [galTile(it.composeAlways, 'Compose-Always', {})]) : null,
@@ -322,9 +329,9 @@
             h('div', { style: { fontFamily: "'DM Sans'", fontWeight: '700', fontSize: '16px', color: '#111111' } }, [it.task]),
             h('div', { style: { fontFamily: "'Chakra Petch'", fontSize: '10.5px', color: '#A3A3A3', marginTop: '3px', letterSpacing: '0.06em', textTransform: 'uppercase' }, html: it.env })
           ]),
-          h('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' } }, [
-            h('span', { style: { fontFamily: "'Chakra Petch'", fontSize: '11px', color: '#525252' }, html: 'Rephrase <span style="color:#E27B33;font-weight:700">' + it.base + '%</span> &rarr; RL<sup>2</sup> <span style="color:#1A8341;font-weight:700">' + it.ours + '%</span>' }),
-            h('span', { style: { fontFamily: "'Chakra Petch'", fontSize: '12px', fontWeight: '700', color: '#1A8341', background: '#F9F9F7', border: '1px solid #1A8341', padding: '4px 9px', whiteSpace: 'nowrap', borderRadius: '6px' }, html: '&#9650; ' + delta })
+          h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '7px' } }, [
+            galStatRow('Rephrase', it.base, '#E27B33', 'RL<sup>2</sup> (Compose-Adaptive)', it.ours, '#1A8341'),
+            (tab === 'ood_env' && it.compose != null) ? galStatRow('RL<sup>2</sup> (Compose-Always)', it.compose, '#29A9DF', 'RL<sup>2</sup> (Compose-Adaptive)', it.ours, '#1A8341') : null
           ])
         ]),
         methods
@@ -339,6 +346,14 @@
       });
     }, { rootMargin: '250px 0px', threshold: 0.15 });
     galleryVids.forEach(function (v) { galleryIO.observe(v); });
+    scheduleGalleryAuto();
+  }
+  function galStatRow(fromName, fromVal, fromColor, toName, toVal, toColor) {
+    var d = toVal - fromVal, up = d >= 0, bc = up ? '#1A8341' : '#B91C1C';
+    return h('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' } }, [
+      h('span', { style: { fontFamily: "'Chakra Petch'", fontSize: '11px', color: '#525252' }, html: fromName + ' <span style="color:' + fromColor + ';font-weight:700">' + fromVal + '%</span> &rarr; ' + toName + ' <span style="color:' + toColor + ';font-weight:700">' + toVal + '%</span>' }),
+      h('span', { style: { fontFamily: "'Chakra Petch'", fontSize: '12px', fontWeight: '700', color: bc, background: '#F9F9F7', border: '1px solid ' + bc, padding: '4px 9px', whiteSpace: 'nowrap', borderRadius: '6px' }, html: (up ? '&#9650; +' : '&#9660; &minus;') + Math.abs(d).toFixed(1) + '%' })
+    ]);
   }
   function galGroup(label, tiles, combo) {
     return h('div', { 'class': 'gal-group' + (combo ? ' combo' : '') }, [
@@ -438,8 +453,8 @@
           if (demo.plot.readyState >= 1 && !demo.plot.seeking && Math.abs(demo.plot.currentTime - t) > 0.12) { try { demo.plot.currentTime = t; } catch (e) {} }
           if (demo.cam.paused && !demo.cam.seeking) demoPlay();
           for (var i = 0; i < demo.markers.length; i++) { var m = demo.markers[i]; if (!demo.triggered[m.n] && demo.prevT < m.t && t >= m.t) { demoEnterMarker(m); break; } }
-          if (t >= demo.dur) goBaseline();
-          demo.prevT = t;
+          if (t >= demo.dur) stepDemo(1);
+          else demo.prevT = t;
         } else {
           demo.tops.forEach(function (v) { if (v && v.paused && !v.ended && !v.seeking) v.play().catch(function () {}); });
           var done = demo.tops.length && demo.tops.every(function (v) { return v.ended || (v.duration && isFinite(v.duration) && v.currentTime >= v.duration - 0.2); });
@@ -621,13 +636,13 @@
     + '<polyline points="5 3 13 10 21 3"></polyline><polyline points="5 10 13 17 21 10"></polyline></svg>';
   function initScrollCues() {
     var ids = TOC.map(function (t) { return t[0]; });
-    for (var i = 0; i < ids.length - 1; i++) {
-      var sec = $(ids[i]); if (!sec) continue;
-      var wrap = h('div', { style: { display: 'flex', justifyContent: 'center', marginTop: '34px' } }, [
-        h('a', { href: '#' + ids[i + 1], 'class': 'hv-green', 'aria-label': 'Scroll down for more', style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '7px', color: '#A3A3A3' }, html: CUE_SVG })
-      ]);
-      sec.appendChild(wrap);
-    }
+    // scroll cue only under the overview (hero) section
+    if (ids.length < 2) return;
+    var sec = $(ids[0]); if (!sec) return;
+    var wrap = h('div', { style: { display: 'flex', justifyContent: 'center', marginTop: '34px' } }, [
+      h('a', { href: '#' + ids[1], 'class': 'hv-green', 'aria-label': 'Scroll down for more', style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '7px', color: '#A3A3A3' }, html: CUE_SVG })
+    ]);
+    sec.appendChild(wrap);
   }
 
   /* ---------- boot ---------- */
