@@ -32,42 +32,38 @@
     gallery: {
       ood_prompt: [
         { task: 'Carrot on Plate', env: 'Real robot · π₀', base: 36.7, ours: 63.3,
-          rephrase: 'ood_prompt/real/carrot_on_plate/REPHRASE_s7_episode-0-success-False_RESIZED.mp4',
-          adaptive: 'ood_prompt/real/carrot_on_plate/ADAPTIVE_COMPOSE_s7_episode-0-success-True-HIGH-RES_640x480.mp4',
-          plot: 'ood_prompt/real/carrot_on_plate/SAFE.mov' },
+          rephrase: 'ood_prompt/real/carrot_on_plate/REPHRASE_Carrot_on_Plate_speedx8.mp4',
+          adaptive: 'ood_prompt/real/carrot_on_plate/ADAPTIVE_COMPOSE_Carrot_on_Plate_speedx8.mp4',
+          plot: 'ood_prompt/real/carrot_on_plate/CP_ADAPTIVE_COMPOSE_Carrot_on_Plate_speedx8.mp4' },
         { task: 'Cube in Toolbox', env: 'Real robot · π₀', base: 40, ours: 50,
-          rephrase: 'ood_prompt/real/cube_in_toolbox/REPHRASE_s0_episode-7-success-False_680x480.mp4',
-          adaptive: 'ood_prompt/real/cube_in_toolbox/ADAPTIVE_COMPOSE_s42_episode-0-success-True_640x480.mp4',
-          plot: 'ood_prompt/real/cube_in_toolbox/SAFE.mov' },
+          rephrase: 'ood_prompt/real/cube_in_toolbox/REPHRASE_Cube_in_Toolbox_speedx8.mp4',
+          adaptive: 'ood_prompt/real/cube_in_toolbox/ADAPTIVE_COMPOSE_Cube_in_Toolbox_speedx8.mp4',
+          plot: 'ood_prompt/real/cube_in_toolbox/CP_ADAPTIVE_COMPOSE_Cube_in_Toolbox_speedx8.mp4' },
         { task: 'Pan Cleaning', env: 'Simulation · π₀.₅', base: 24.7, ours: 33.3,
-          rephrase: 'ood_prompt/sim/pan_cleaning/PanClean_rephrase_cropped.mp4',
-          adaptive: 'ood_prompt/sim/pan_cleaning/PanClean_adaptive_compose_cropped.mp4',
-          plot: 'ood_prompt/sim/pan_cleaning/PanClean_adaptive_compose_failure_plot.mp4' },
+          rephrase: 'ood_prompt/sim/pan_cleaning/REPHRASE_Pan_Cleaning_speedx3.mp4',
+          adaptive: 'ood_prompt/sim/pan_cleaning/ADAPTIVE_COMPOSE_Pan_Cleaning_speedx3.mp4',
+          plot: 'ood_prompt/sim/pan_cleaning/CP_ADAPTIVE_COMPOSE_Pan_Cleaning_speedx3.mp4' },
         { task: 'Spoon on Towel', env: 'Simulation · π₀', base: 36.0, ours: 50.7,
-          rephrase: 'ood_prompt/sim/spoon_on_towel/SpoonTowel_rephrase.mp4',
-          adaptive: 'ood_prompt/sim/spoon_on_towel/SpoonTowel_adaptive_compose.mp4',
-          plot: 'ood_prompt/sim/spoon_on_towel/SpoonTowel_adaptive_compose_failure_plot.mp4' },
-        { task: 'Stack Cubes', env: 'Simulation · π₀', base: 28.7, ours: 40.7,
-          rephrase: 'ood_prompt/sim/stack_cube/StackCubes_rephrase.mp4',
-          adaptive: 'ood_prompt/sim/stack_cube/StackCubes_adaptive_compose.mp4',
-          plot: 'ood_prompt/sim/stack_cube/StackCubes_adaptive_compose_failure_plot.mp4' }
+          rephrase: 'ood_prompt/sim/spoon_on_towel/REPHRASE_Spoon_on_Towel_speedx1.mp4',
+          adaptive: 'ood_prompt/sim/spoon_on_towel/ADAPTIVE_COMPOSE_Spoon_on_Towel_speedx1.mp4',
+          plot: 'ood_prompt/sim/spoon_on_towel/CP_ADAPTIVE_COMPOSE_Spoon_on_Towel_speedx1.mp4' }
       ],
       ood_env: [
         { task: 'Toy Dinosaur on Towel', env: 'Simulation · π₀', base: 49.3, ours: 53.3, compose: 46,
-          rephrase: 'ood_env/sim/dino_on_towel/toyDino_rephrase.mp4',
-          composeAlways: 'ood_env/sim/dino_on_towel/toyDino_compose_alltimes.mp4',
-          adaptive: 'ood_env/sim/dino_on_towel/toyDino_compose_adaptive.mp4',
-          plot: 'ood_env/sim/dino_on_towel/toyDino_compose_adaptive_failure_plot.mp4' },
+          rephrase: 'ood_env/sim/dino_on_towel/REPHRASE_sim_Dino_in_Toolbox_speedx5.mp4',
+          composeAlways: 'ood_env/sim/dino_on_towel/COMPOSE_ALWAYS_sim_Dino_in_Toolbox_speedx5.mp4',
+          adaptive: 'ood_env/sim/dino_on_towel/ADAPTIVE_COMPOSE_sim_Dino_in_Toolbox_speedx5.mp4',
+          plot: 'ood_env/sim/dino_on_towel/CP_ADAPTIVE_COMPOSE_sim_Dino_in_Toolbox_speedx5.mp4' },
         { task: 'Tape in Toolbox', env: 'Real robot · π₀', base: 36.7, ours: 53.3, compose: 33.3,
-          rephrase: 'ood_env/real/tape_in_toolbox/REPHRASE_s42_episode_4_success_False_raw_camera_left.mp4',
-          composeAlways: 'ood_env/real/tape_in_toolbox/COMPOSE_ALWAYS_s7_episode_0_success_False_raw_camera_left.mp4',
-          adaptive: 'ood_env/real/tape_in_toolbox/ADAPTIVE_COMPOSE_s7_episode_6_success_True_raw_camera_left_13s.mp4',
-          plot: 'ood_env/real/tape_in_toolbox/ADAPTIVE_COMPOSE_TAPE_episode_6_success_True_failure_prediction_plot (1).mp4' },
+          rephrase: 'ood_env/real/tape_in_toolbox/REPHRASE_Tape_in_Toolbox_speedx5.mp4',
+          composeAlways: 'ood_env/real/tape_in_toolbox/COMPOSE_ALWAYS_Tape_in_Toolbox_speedx5.mp4',
+          adaptive: 'ood_env/real/tape_in_toolbox/ADAPTIVE_COMPOSE_Tape_in_Toolbox_speedx5.mp4',
+          plot: 'ood_env/real/tape_in_toolbox/CP_ADAPTIVE_COMPOSE_Tape_in_Toolbox_speedx5.mp4' },
         { task: 'Screwdriver in Toolbox', env: 'Real robot · π₀', base: 16.7, ours: 33.3, compose: 20,
-          rephrase: 'ood_env/real/screwdriver_in_toolbox_new/REPHRASE_Screwdriver_in_Toolbox_speedx5.mp4',
-          composeAlways: 'ood_env/real/screwdriver_in_toolbox_new/COMPOSE_ALWAYS_Screwdriver_in_Toolbox_speedx5.mp4',
-          adaptive: 'ood_env/real/screwdriver_in_toolbox_new/ADAPTIVE_COMPOSE_Screwdriver_in_Toolbox_speedx5.mp4',
-          plot: 'ood_env/real/screwdriver_in_toolbox_new/CP_ADAPTIVE_COMPOSE_Screwdriver_in_Toolbox_speedx5.mp4' }
+          rephrase: 'ood_env/real/screwdriver_in_toolbox/REPHRASE_Screwdriver_in_Toolbox_speedx5.mp4',
+          composeAlways: 'ood_env/real/screwdriver_in_toolbox/COMPOSE_ALWAYS_Screwdriver_in_Toolbox_speedx5.mp4',
+          adaptive: 'ood_env/real/screwdriver_in_toolbox/ADAPTIVE_COMPOSE_Ext_Screwdriver_in_Toolbox_speedx5.mp4',
+          plot: 'ood_env/real/screwdriver_in_toolbox/CP_ADAPTIVE_COMPOSE_Screwdriver_in_Toolbox_speedx5.mp4' }
       ]
     }
   };
@@ -297,10 +293,7 @@
       tabs.appendChild(h('button', { onClick: function () { state.galleryTab = g[0]; renderGallery(); }, style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11.5px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 20px', border: 'none', borderRight: '1px solid ' + (i === 0 ? '#111111' : 'transparent'), background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111' } }, [g[1]]));
     });
     var fc = $('gallery-filters'); clear(fc);
-    fc.appendChild(h('div', { style: { display: 'flex', alignItems: 'center', gap: '14px', fontFamily: "'Chakra Petch'", fontSize: '10.5px', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase', color: '#525252' } }, [
-      h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '6px' } }, [h('span', { style: { width: '10px', height: '10px', borderRadius: '3px', background: '#E27B33' } }), 'Baseline']),
-      h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '6px' } }, [h('span', { style: { width: '10px', height: '10px', borderRadius: '3px', background: '#1A8341' } }), 'RL² (Ours)'])
-    ]));
+    fc.appendChild(h('div', { style: { display: 'flex', alignItems: 'center', gap: '14px', fontFamily: "'Chakra Petch'", fontSize: '10.5px', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase', color: '#525252' } }));
 
     var INSIGHT = {
       ood_prompt: 'On out-of-domain prompts, adaptive steering pre-empts failure and <strong style="color:#111111;font-style:normal">replans on the fly</strong> &mdash; recovering task success where the frozen VLA stalls.',
@@ -329,7 +322,7 @@
             h('div', { style: { fontFamily: "'DM Sans'", fontWeight: '700', fontSize: '16px', color: '#111111' } }, [it.task]),
             h('div', { style: { fontFamily: "'Chakra Petch'", fontSize: '10.5px', color: '#A3A3A3', marginTop: '3px', letterSpacing: '0.06em', textTransform: 'uppercase' }, html: it.env })
           ]),
-          h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '7px' } }, [
+          h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '7px' } }, [
             galStatRow('Rephrase', it.base, '#E27B33', 'RL<sup>2</sup> (Compose-Adaptive)', it.ours, '#1A8341'),
             (tab === 'ood_env' && it.compose != null) ? galStatRow('RL<sup>2</sup> (Compose-Always)', it.compose, '#29A9DF', 'RL<sup>2</sup> (Compose-Adaptive)', it.ours, '#1A8341') : null
           ])
