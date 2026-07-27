@@ -125,7 +125,7 @@
   var BIBTEX = '@article{tan2026rl2vla,\n  title   = {RL^2-VLA: Adaptive RL Latent Compositional Steering with Test-Time\n             Scaling for Vision-Language-Action Models},\n  author  = {Tan, Derek Ming Siang and Shailesh, Shailesh and Iyer, Srikrishna and\n             Teo, William Wei Jie and Ju, Yuanliang and Gu, Qiao and Sartoretti, Guillaume},\n  year    = {2026},\n  journal = {arXiv preprint}\n}';
 
   var TOC = [['overview', 'Overview'], ['abstract', 'Abstract'], ['demo', 'RL² in Action'], ['method', 'Method'], ['results', 'Results'], ['gallery', 'Task Gallery'], ['bibtex', 'BibTeX']];
-  var BENCH_TABS = [['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['polaris_S', 'π₀.₅ · OOD Prompt'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env']];
+  var BENCH_TABS = [['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['polaris_S', 'π₀.₅ · OOD Prompt'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env'], ['combined_scaling', 'π₀ · Combined Scaling']];
 
   /* ---------- state ---------- */
   var state = { activeBench: 'pi0_indomain_ood_prompt', benchHidden: {}, scalingHidden: {}, samplesHidden: {}, galleryTab: 'ood_prompt', grown: false, activeSection: 'overview', lineHover: null };
@@ -254,24 +254,41 @@
   }
 
   function renderBench() {
-    var bench = DATA.benchmarks[state.activeBench];
-    $('bench-title').textContent = bench.title;
+    var combined = state.activeBench === 'combined_scaling';
+    var bench = combined ? null : DATA.benchmarks[state.activeBench];
+    $('bench-title').textContent = combined ? 'Combined test-time scaling' : bench.title;
+    var cap = $('bench-cap'); if (cap) cap.style.display = combined ? '' : 'none';
     var tabs = $('bench-tabs'); clear(tabs);
     BENCH_TABS.forEach(function (t) {
       var id = t[0], a = id === state.activeBench;
       tabs.appendChild(h('button', { 'data-id': id, onClick: function () { state.activeBench = id; renderBench(); }, style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '10.5px', fontWeight: '500', letterSpacing: '0.04em', textTransform: 'uppercase', padding: '8px 11px', background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111', border: '1px solid #111111', borderRadius: '8px', transition: 'all .2s' } }, [t[1]]));
     });
     var ser = $('bench-series'); clear(ser);
-    bench.series.forEach(function (n) {
-      var col = colorFor(n);
-      ser.appendChild(h('button', { onClick: function () { state.benchHidden[n] = !state.benchHidden[n]; renderBench(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', padding: '2px 0', opacity: state.benchHidden[n] ? '0.34' : '1' } }, [
-        h('span', { style: { width: '12px', height: '12px', background: col } }),
-        h('span', { style: { fontFamily: "'DM Sans'", fontSize: '12.5px', color: '#222222' } }, [n])
-      ]));
-    });
+    if (combined) {
+      var sc = DATA.scalingSamples;
+      sc.series.forEach(function (n, i) {
+        ser.appendChild(h('button', { onClick: function () { state.samplesHidden[n] = !state.samplesHidden[n]; renderBench(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', padding: '2px 0', opacity: state.samplesHidden[n] ? '0.34' : '1' } }, [
+          h('span', { style: { width: '12px', height: '12px', background: sc.colors[i] } }),
+          h('span', { style: { fontFamily: "'DM Sans'", fontSize: '12.5px', color: '#222222' } }, [n])
+        ]));
+      });
+    } else {
+      bench.series.forEach(function (n) {
+        var col = colorFor(n);
+        ser.appendChild(h('button', { onClick: function () { state.benchHidden[n] = !state.benchHidden[n]; renderBench(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', padding: '2px 0', opacity: state.benchHidden[n] ? '0.34' : '1' } }, [
+          h('span', { style: { width: '12px', height: '12px', background: col } }),
+          h('span', { style: { fontFamily: "'DM Sans'", fontSize: '12.5px', color: '#222222' } }, [n])
+        ]));
+      });
+    }
     var chart = $('bench-chart'); clear(chart);
-    chart.className = state.grown ? 'bench-grown' : '';
-    chart.appendChild(barChart({ tasks: bench.tasks, series: bench.series, ymax: bench.ymax, std: bench.std }));
+    if (combined) {
+      chart.className = state.grown ? 'samples-grown' : '';
+      chart.appendChild(hbarChart(DATA.scalingSamples));
+    } else {
+      chart.className = state.grown ? 'bench-grown' : '';
+      chart.appendChild(barChart({ tasks: bench.tasks, series: bench.series, ymax: bench.ymax, std: bench.std }));
+    }
   }
 
   function renderScaling() {
@@ -288,7 +305,7 @@
 
   /* ---------- combined scaling (samples × rephrases) horizontal bar chart ---------- */
   function hbarChart(cfg) {
-    var W = 800, H = 360, m = { l: 128, r: 122, t: 8, b: 40 };
+    var W = 820, H = 372, m = { l: 128, r: 150, t: 20, b: 40 };
     var pw = W - m.l - m.r, ph = H - m.t - m.b, ymax = cfg.ymax, ng = cfg.groups.length, ns = cfg.series.length;
     var x = function (v) { return m.l + (v / ymax) * pw; }, els = [];
     for (var t = 0; t <= ymax; t += 10) { var xx = x(t);
@@ -319,20 +336,6 @@
     els.push(S('line', { x1: m.l, x2: m.l + pw, y1: m.t + ph, y2: m.t + ph, stroke: '#111111', strokeWidth: 1.5 }));
     return h('div', { style: { width: '100%' } }, [S('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', style: { display: 'block', overflow: 'visible' } }, els)]);
   }
-  function renderScalingSamples() {
-    var cfg = DATA.scalingSamples, leg = $('scaling-samples-legend'); if (!leg) return;
-    clear(leg);
-    cfg.series.forEach(function (n, i) {
-      leg.appendChild(h('button', { onClick: function () { state.samplesHidden[n] = !state.samplesHidden[n]; renderScalingSamples(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px', background: 'none', border: 'none', padding: '2px 0', opacity: state.samplesHidden[n] ? '0.34' : '1' } }, [
-        h('span', { style: { width: '12px', height: '12px', background: cfg.colors[i] } }),
-        h('span', { style: { fontFamily: "'DM Sans'", fontSize: '12.5px', color: '#222222' } }, [n])
-      ]));
-    });
-    var host = $('scaling-samples-chart'); if (!host) return; clear(host);
-    host.className = 'samples-grown';
-    host.appendChild(hbarChart(cfg));
-  }
-
   var galleryVids = [], galleryIO = null, galleryTimer = null;
   function galleryInView() { var g = $('gallery'); if (!g) return false; var r = g.getBoundingClientRect(), vh = window.innerHeight || 800; return r.bottom > vh * 0.15 && r.top < vh * 0.85; }
   function scheduleGalleryAuto() {
@@ -391,10 +394,13 @@
     galleryIO = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         var v = e.target;
-        if (e.isIntersecting) { if (!v.src) { v.src = v.getAttribute('data-src'); } v.play().catch(function () {}); }
+        // lazily attach the source as the tile nears the viewport, but only start
+        // playback once the tile is actually visible on screen
+        if (e.isIntersecting && !v.src) { v.src = v.getAttribute('data-src'); }
+        if (e.isIntersecting && e.intersectionRatio >= 0.25) { v.play().catch(function () {}); }
         else { v.pause(); }
       });
-    }, { rootMargin: '250px 0px', threshold: 0.15 });
+    }, { rootMargin: '0px', threshold: [0, 0.25] });
     galleryVids.forEach(function (v) { galleryIO.observe(v); });
     scheduleGalleryAuto();
   }
@@ -461,6 +467,7 @@
     stage: null, playIcon: null, pauseIcon: null, track: null, fill: null, timeEl: null,
     playing: true, ready: false, markerPause: false, pauseUntil: 0, triggered: {}, prevT: 0, inView: false, dur: 8.4, baseDur: 9, fig: null, vc: 0, fallback: null };
   function fmt(s) { s = Math.max(0, s || 0); var m = Math.floor(s / 60), sec = Math.floor(s % 60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
+  function demoFigInView() { var fig = demo.fig || (demo.fig = document.querySelector('[data-demo-fig]')); if (!fig) return true; var rr = fig.getBoundingClientRect(), vh = window.innerHeight || 800; return rr.bottom > vh * 0.1 && rr.top < vh * 0.9; }
   function demoLoaders(show) { demo.loaders.forEach(function (l) { if (l) l.style.display = show ? 'flex' : 'none'; }); }
   function topDur() { var d = 0; demo.tops.forEach(function (v) { if (v && v.duration && isFinite(v.duration)) d = Math.max(d, v.duration); }); return d || demo.baseDur; }
   function baseT() { var t = 0; demo.tops.forEach(function (v) { if (v) t = Math.max(t, v.currentTime || 0); }); return t; }
@@ -490,7 +497,7 @@
   function scrub(e) { if (!demo.ready || !demo.track) return; var r = demo.track.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), t = f * demo.dur; if (demo.phase !== 'proposed') setPhase('proposed'); demoSeek(t); demo.markerPause = false; demoHideOverlay(); if (demo.playing) demoPlay(); demoSyncIcon(); updateStatusUI(); }
   function demoTick() {
     if (demo.cam && demo.plot && demo.ready) {
-      if ((demo.vc = (demo.vc + 1) % 6) === 0) { var fig = demo.fig || (demo.fig = document.querySelector('[data-demo-fig]')); if (fig) { var rr = fig.getBoundingClientRect(), vh = window.innerHeight || 800; demo.inView = (rr.bottom > vh * 0.1 && rr.top < vh * 0.9); } else demo.inView = true; }
+      if ((demo.vc = (demo.vc + 1) % 6) === 0) { demo.inView = demoFigInView(); }
       var prop = demo.phase === 'proposed';
       var t = prop ? (demo.cam.currentTime || 0) : baseT();
       var dur = prop ? demo.dur : topDur();
@@ -563,13 +570,12 @@
 
     $('demo-ex-eyebrow').textContent = cfg.eyebrow;
     $('demo-ex-title').textContent = cfg.title;
-    $('demo-counter').textContent = (demo.ex + 1) + ' / ' + DEMO_EXAMPLES.length;
+    renderDemoTabs();
 
     var stage = demo.stage; clear(stage);
 
     // ---- group 1: baselines (struggle on this task) ----
-    var baseGrid = h('div', { class: 'demo-grid' });
-    if (cfg.top.length === 1) { baseGrid.style.maxWidth = 'calc(50% - 6px)'; baseGrid.style.margin = '0 auto'; baseGrid.style.gridTemplateColumns = '1fr'; }
+    var baseGrid = h('div', { class: 'demo-grid' + (cfg.top.length === 1 ? ' demo-grid-solo' : '') });
     cfg.top.forEach(function (tc) {
       var b = mkBlock(tc, 'loop', { aspect: cfg.blockAspect });
       baseGrid.appendChild(b.block); demo.tops.push(b.vid);
@@ -615,19 +621,14 @@
     // clear old keypoint ticks
     [].slice.call(demo.track.querySelectorAll('.demo-tick')).forEach(function (n) { n.remove(); });
 
-    // dots
-    var dots = $('demo-dots'); clear(dots);
-    DEMO_EXAMPLES.forEach(function (e, i) {
-      dots.appendChild(h('button', { 'aria-label': 'Show example ' + (i + 1), onClick: (function (idx) { return function () { if (idx !== demo.ex) { demo.ex = idx; renderDemo(); } }; })(i),
-        style: { cursor: 'pointer', width: '9px', height: '9px', padding: '0', borderRadius: '50%', border: '1px solid #111111', background: i === demo.ex ? '#111111' : 'transparent' } }));
-    });
-
     demo.fill.style.width = '0%'; demo.timeEl.textContent = '0:00 / 0:00'; updateStatusUI(); demoSyncIcon(); demoLoaders(true);
 
-    // start baseline videos immediately; prime hero pair, then add timeline ticks
-    demo.tops.forEach(function (v) { v.play().catch(function () {}); });
+    // determine whether the demo is on screen right now (demoTick keeps this fresh afterwards)
+    demo.inView = demoFigInView();
+    // start baseline videos only when in view; prime hero pair, then add timeline ticks
+    if (demo.inView) demo.tops.forEach(function (v) { v.play().catch(function () {}); });
     demo.baseDur = 9;
-    demo.fallback = setTimeout(function () { if (gen === demo.gen && !demo.ready) { demo.dur = Math.max(6, (demo.cam.duration || 8.4)); demo.ready = true; demoLoaders(false); setPhase('baseline'); if (demo.inView !== false) demoPlay(); } }, 18000);
+    demo.fallback = setTimeout(function () { if (gen === demo.gen && !demo.ready) { demo.dur = Math.max(6, (demo.cam.duration || 8.4)); demo.ready = true; demoLoaders(false); setPhase('baseline'); if (demo.inView) demoPlay(); } }, 18000);
     Promise.all([prime(demo.cam), prime(demo.plot)]).then(function () {
       if (gen !== demo.gen) return;
       clearTimeout(demo.fallback);
@@ -638,44 +639,23 @@
         var tick = h('span', { class: 'demo-tick', style: { position: 'absolute', top: '50%', left: Math.min(99, (m.t / demo.dur) * 100) + '%', transform: 'translate(-50%,-50%)', width: '7px', height: '7px', borderRadius: '50%', background: '#F9F9F7', border: '1.5px solid #111111', display: 'none' } });
         demo.track.appendChild(tick); demo.ticks.push(tick);
       });
-      demo.ready = true; demoLoaders(false); setPhase('baseline'); demo.phaseStart = performance.now(); if (demo.inView !== false) demoPlay();
-    });
+      demo.ready = true; demoLoaders(false); setPhase('baseline'); demo.phaseStart = performance.now(); demo.inView = demoFigInView(); if (demo.inView) demoPlay(); });
   }
   function stepDemo(d) { demo.ex = (demo.ex + d + DEMO_EXAMPLES.length) % DEMO_EXAMPLES.length; renderDemo(); }
+  function renderDemoTabs() {
+    var tabs = $('demo-tabs'); if (!tabs) return; clear(tabs);
+    DEMO_EXAMPLES.forEach(function (ex, i) {
+      var a = i === demo.ex;
+      tabs.appendChild(h('button', { 'aria-label': 'Show ' + ex.title, onClick: (function (idx) { return function () { if (idx !== demo.ex) { demo.ex = idx; renderDemo(); } }; })(i),
+        style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 15px', border: 'none', borderRight: i < DEMO_EXAMPLES.length - 1 ? '1px solid #111111' : 'none', background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111', whiteSpace: 'nowrap', transition: 'all .2s' } }, [ex.title]));
+    });
+  }
   function initDemo() {
     demo.stage = $('demo-stage'); demo.playIcon = $('demo-play-icon'); demo.pauseIcon = $('demo-pause-icon'); demo.track = $('demo-track'); demo.fill = $('demo-fill'); demo.timeEl = $('demo-time');
     $('demo-play').addEventListener('click', togglePlay);
     demo.track.addEventListener('click', scrub);
-    $('demo-prev').addEventListener('click', function () { stepDemo(-1); });
-    $('demo-next').addEventListener('click', function () { stepDemo(1); });
     renderDemo();
     requestAnimationFrame(demoTick);
-  }
-
-  /* ---------- scaling views carousel (test-time scaling laws + combined samples) ---------- */
-  function initScalingCarousel() {
-    var SLIDES = [
-      { title: 'Test-time scaling laws', sub: 'Fitted power law <em>e</em> &asymp; a&middot;k<sup>b</sup> &middot; oracle action error vs. action samples (k)' },
-      { title: 'Combined test-time scaling', sub: 'Success rate (%)' }
-    ];
-    var n = SLIDES.length, idx = 0;
-    var titleEl = $('scaling-title'), subEl = $('scaling-sub'), counter = $('scaling-counter');
-    if (!titleEl) return;
-    function render() {
-      titleEl.innerHTML = SLIDES[idx].title;
-      subEl.innerHTML = SLIDES[idx].sub;
-      if (counter) counter.textContent = (idx + 1) + ' / ' + n;
-      for (var i = 0; i < n; i++) {
-        var s = $('scaling-slide-' + i); if (s) s.style.display = i === idx ? '' : 'none';
-        var c = $('scaling-cap-' + i); if (c) c.style.display = i === idx ? '' : 'none';
-      }
-      if (idx === 1) renderScalingSamples();
-    }
-    function go(d) { idx = (idx + d + n) % n; render(); }
-    var pv = $('scaling-prev'), nx = $('scaling-next');
-    if (pv) pv.addEventListener('click', function () { go(-1); });
-    if (nx) nx.addEventListener('click', function () { go(1); });
-    render();
   }
 
   /* ---------- bibtex ---------- */
@@ -727,7 +707,6 @@
     renderToc();
     renderBench();
     renderScaling();
-    initScalingCarousel();
     renderGallery();
     archRenderFrames(); archRender(); archSchedule(ARCH_DUR);
     $('arch-pause').addEventListener('click', archTogglePause);
@@ -735,6 +714,24 @@
     initDemo();
     initObservers();
     initScrollCues();
+    initTooltipGuards();
+  }
+
+  /* ---------- tooltip guards ---------- */
+  // The line/bar charts re-render on every mousemove, which removes the very SVG
+  // element that carries the `mouseleave` handler — so on scroll (or a fast exit)
+  // the leave event can be lost and the fixed-position tooltip stays stuck on screen.
+  // Attach the safety nets to the stable chart containers (which persist across
+  // re-renders) and to scroll, so the tooltip always clears.
+  function clearLineTip() { if (state.lineHover) { state.lineHover = null; renderScaling(); } hideTip(); }
+  function initTooltipGuards() {
+    ['scaling-chart-failure', 'scaling-chart-success'].forEach(function (id) {
+      var el = $(id); if (el) el.addEventListener('mouseleave', clearLineTip);
+    });
+    var bc = $('bench-chart'); if (bc) bc.addEventListener('mouseleave', hideTip);
+    window.addEventListener('scroll', function () {
+      if (TT.box && TT.box.style.display === 'block') { clearLineTip(); }
+    }, { passive: true });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

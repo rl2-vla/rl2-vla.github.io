@@ -107,11 +107,7 @@
           <div id="demo-ex-eyebrow" style="font-family:'Chakra Petch';font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#1A8341"></div>
           <div id="demo-ex-title" style="font-family:'DM Sans';font-weight:700;font-size:clamp(18px,2.1vw,22px);color:#111111;margin-top:2px"></div>
         </div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <button id="demo-prev" class="hv-invert" aria-label="Previous example" style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#F9F9F7;border:1px solid #111111;color:#111111;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-          <div id="demo-counter" style="min-width:64px;text-align:center;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.06em;color:#525252"></div>
-          <button id="demo-next" class="hv-invert" aria-label="Next example" style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#F9F9F7;border:1px solid #111111;color:#111111;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
-        </div>
+        <div id="demo-tabs" style="display:inline-flex;flex-wrap:wrap;border:1px solid #111111;border-radius:8px;overflow:hidden;max-width:100%"></div>
       </div>
 
       <div id="demo-stage" style="margin-top:16px;position:relative"></div>
@@ -127,7 +123,6 @@
         <div id="demo-time" style="flex:none;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.04em;color:#525252;min-width:76px;text-align:right">0:00 / 0:00</div>
       </div>
 
-      <div id="demo-dots" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px"></div>
     </div>
   </figure>
 </section>
@@ -173,11 +168,6 @@
             <div id="scaling-title" style="font-family:'DM Sans';font-weight:700;font-size:22px;color:#111111">Test-time scaling laws</div>
             <div id="scaling-sub" style="font-family:'Chakra Petch';font-size:11.5px;color:#525252;margin-top:4px;letter-spacing:0.02em">Fitted power law <em>e</em> &asymp; a&middot;k<sup>b</sup> &middot; oracle action error vs. action samples (k)</div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;flex:none">
-            <button id="scaling-prev" class="hv-invert" aria-label="Previous view" style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#F9F9F7;border:1px solid #111111;color:#111111;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-            <div id="scaling-counter" style="min-width:52px;text-align:center;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.06em;color:#525252">1 / 2</div>
-            <button id="scaling-next" class="hv-invert" aria-label="Next view" style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#F9F9F7;border:1px solid #111111;color:#111111;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
-          </div>
         </div>
         <div id="scaling-slide-0">
           <div id="scaling-legend" style="display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 2px;padding-top:12px;border-top:1px solid #E5E5E0"></div>
@@ -192,15 +182,9 @@
             </div>
           </div>
         </div>
-        <div id="scaling-slide-1" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid #E5E5E0">
-          <div style="display:flex;align-items:center;gap:7px;font-family:'Chakra Petch';font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1A8341"><span aria-hidden="true" style="color:#1A8341">&#9670;</span></div>
-          <div id="scaling-samples-legend" style="display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 2px"></div>
-          <div id="scaling-samples-chart" style="max-width:720px;margin:8px auto 0"></div>
-        </div>
       </div>
     </div>
     <p id="scaling-cap-0" style="font-family:'DM Sans';text-align:center;font-size:13px;color:#737373;margin:14px auto 0;max-width:760px;line-height:1.55"><span style="font-family:'Chakra Petch';font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:#111111"></span>Test-Time Scaling analysis using oracle verifier &amp; &pi;<sub>0</sub> (BridgeV2 Dataset). Compare the panels: RL<sup>2</sup> (green) drives error <strong style="color:#111111">lowest during failure</strong> yet stays <strong style="color:#111111">high during success</strong> &mdash; motivating adaptive, gated steering.</p>
-    <p id="scaling-cap-1" style="display:none;font-family:'DM Sans';text-align:center;font-size:13px;color:#737373;margin:14px auto 0;max-width:760px;line-height:1.55"><span style="font-family:'Chakra Petch';font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:#111111"></span>Combining the two axes of test-time scaling &mdash; sample <strong style="color:#111111">diversity</strong> (8 rephrases &times; 5 samples) with adaptive <strong style="color:#111111">composition</strong> &mdash; compounds the gains, lifting success by up to <strong style="color:#1A8341">+18.7%</strong> over single-sample inference.</p>
   </div>
 
   <div style="background:#F9F9F7;border:1px solid #111111;border-radius:12px;padding:20px 20px 18px;margin-top:26px">
@@ -228,6 +212,7 @@
     <div id="bench-series" style="display:flex;flex-wrap:wrap;gap:8px 18px;margin:18px 0 4px"></div>
     <div id="bench-chart" style="margin-top:6px"></div>
   </div>
+  <p id="bench-cap" style="display:none;font-family:'DM Sans';text-align:center;font-size:13px;color:#737373;margin:14px auto 0;max-width:760px;line-height:1.55">Combining the two axes of test-time scaling &mdash; sample <strong style="color:#111111">diversity</strong> (8 rephrases &times; 5 samples) with adaptive <strong style="color:#111111">composition</strong> &mdash; compounds the gains, lifting success by up to <strong style="color:#1A8341">+18.7%</strong> over single-sample inference.</p>
 </section>
 
 <section id="gallery" data-sec="gallery" class="rev" style="position:relative;padding:76px 0">

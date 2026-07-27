@@ -52,7 +52,10 @@ pre{margin:0}
 .demo-block.is-plot .demo-tag{background:rgba(17,17,17,0.86)}
 .demo-block.is-hero{border-color:#1A8341;box-shadow:0 0 0 1px #1A8341}
 .demo-block.is-hero .demo-tag{background:#1A8341;color:#F9F9F7}
-@media (max-width:600px){.demo-grid{grid-template-columns:1fr}.demo-span2{grid-column:auto!important}}
+/* single-baseline example (e.g. Pan cleaning): match the width of one "ours" video on desktop */
+.demo-grid-solo{max-width:calc(50% - 6px);margin:0 auto;grid-template-columns:1fr}
+/* on phones the "ours" videos stack full-width, so the lone baseline must too (else it looks shrunk) */
+@media (max-width:600px){.demo-grid{grid-template-columns:1fr}.demo-grid-solo{max-width:none}.demo-span2{grid-column:auto!important}}
 
 /* grouped baseline vs. proposed */
 .demo-group{border:1px solid #E5E5E0;border-radius:14px;padding:12px 12px 13px;background:#FCFCFB;transition:opacity .45s ease,filter .45s ease,box-shadow .3s ease}
@@ -98,11 +101,12 @@ pre{margin:0}
 .gal-tag{position:absolute;left:8px;top:8px;z-index:3;padding:4px 8px;border-radius:6px;background:rgba(10,10,10,0.74);color:#F9F9F7;font-family:'Chakra Petch';font-size:9px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;backdrop-filter:blur(3px)}
 .gal-tile.plot .gal-tag{background:rgba(17,17,17,0.86)}
 .gal-tile.ours .gal-tag{background:#1A8341}
-/* gallery: on phones keep every video on one row and scroll horizontally instead of stacking */
+/* gallery: on phones stack every video full-width so all tiles share the same
+   dimensions (side-by-side columns squeeze the adaptive-steering + CP-band pair
+   into a smaller size than the rephrase clip) */
 @media (max-width:760px){
-  .gal-methods{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px}
-  .gal-methods.prompt{grid-template-columns:minmax(210px,1fr) minmax(320px,1.5fr)}
-  .gal-methods.env{grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) minmax(300px,1.5fr)}
+  .gal-methods.prompt,.gal-methods.env{grid-template-columns:1fr;overflow-x:visible}
+  .gal-group.combo .gal-tiles{grid-template-columns:1fr}
 }
 
 /* ============ mobile (<=760px) ============ */
