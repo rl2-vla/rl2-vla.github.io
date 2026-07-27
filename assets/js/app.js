@@ -29,16 +29,18 @@
       failure: { Repeated: [0.4099, -0.0438], Residual: [0.4051, -0.0814], Rephrase: [0.4073, -0.0829], RL: [0.4099, -0.0858], RLT: [0.4111, -0.0867], Concat: [0.4116, -0.0882], RBF: [0.4147, -0.0988], 'RL² (Ours)': [0.3983, -0.1081] },
       success: { Repeated: [0.0380, -0.1657], Residual: [0.0454, -0.2878], Rephrase: [0.0385, -0.3243], RL: [0.0431, -0.2884], RLT: [0.0445, -0.2865], Concat: [0.0416, -0.3373], RBF: [0.0548, -0.3007], 'RL² (Ours)': [0.0468, -0.3250] }
     },
+    scalingSamples: {
+      ymax: 70,
+      series: ['8 Rephrases × 5 Samples', '40× Samples', '1× Sample'],
+      colors: ['#7D2184', '#A02B93', '#C8A4C2'],
+      groups: [
+        { name: 'RL² (Compose-Adaptive)', vals: [60.4, 47.4, 44.6], std: [1.6, 3.8, 1.4], gain: 15.8, gainColor: '#1A8341' },
+        { name: 'RL² (Compose-Always)', vals: [57.9, 43.7, 39.2], std: [1.6, 1.9, 3.8], gain: 18.7, gainColor: '#29A9DF' },
+        { name: 'Repeated / Rephrase', vals: [50.2, 42.1, 40.2], std: [4.7, 0.5, 0.8], gain: 10.0, gainColor: '#E27B33' }
+      ]
+    },
     gallery: {
       ood_prompt: [
-        { task: 'Carrot on Plate', env: 'Real robot · π₀', base: 36.7, ours: 63.3,
-          rephrase: 'ood_prompt/real/carrot_on_plate/REPHRASE_Carrot_on_Plate_speedx8.mp4',
-          adaptive: 'ood_prompt/real/carrot_on_plate/ADAPTIVE_COMPOSE_Carrot_on_Plate_speedx8.mp4',
-          plot: 'ood_prompt/real/carrot_on_plate/CP_ADAPTIVE_COMPOSE_Carrot_on_Plate_speedx8.mp4' },
-        { task: 'Cube in Toolbox', env: 'Real robot · π₀', base: 40, ours: 50,
-          rephrase: 'ood_prompt/real/cube_in_toolbox/REPHRASE_Cube_in_Toolbox_speedx8.mp4',
-          adaptive: 'ood_prompt/real/cube_in_toolbox/ADAPTIVE_COMPOSE_Cube_in_Toolbox_speedx8.mp4',
-          plot: 'ood_prompt/real/cube_in_toolbox/CP_ADAPTIVE_COMPOSE_Cube_in_Toolbox_speedx8.mp4' },
         { task: 'Pan Cleaning', env: 'Simulation · π₀.₅', base: 24.7, ours: 33.3,
           rephrase: 'ood_prompt/sim/pan_cleaning/REPHRASE_Pan_Cleaning_speedx3.mp4',
           adaptive: 'ood_prompt/sim/pan_cleaning/ADAPTIVE_COMPOSE_Pan_Cleaning_speedx3.mp4',
@@ -46,7 +48,15 @@
         { task: 'Spoon on Towel', env: 'Simulation · π₀', base: 36.0, ours: 50.7,
           rephrase: 'ood_prompt/sim/spoon_on_towel/REPHRASE_Spoon_on_Towel_speedx1.mp4',
           adaptive: 'ood_prompt/sim/spoon_on_towel/ADAPTIVE_COMPOSE_Spoon_on_Towel_speedx1.mp4',
-          plot: 'ood_prompt/sim/spoon_on_towel/CP_ADAPTIVE_COMPOSE_Spoon_on_Towel_speedx1.mp4' }
+          plot: 'ood_prompt/sim/spoon_on_towel/CP_ADAPTIVE_COMPOSE_Spoon_on_Towel_speedx1.mp4' },
+        { task: 'Carrot on Plate', env: 'Real robot · π₀', base: 36.7, ours: 63.3,
+          rephrase: 'ood_prompt/real/carrot_on_plate/REPHRASE_Carrot_on_Plate_speedx8.mp4',
+          adaptive: 'ood_prompt/real/carrot_on_plate/ADAPTIVE_COMPOSE_Carrot_on_Plate_speedx8.mp4',
+          plot: 'ood_prompt/real/carrot_on_plate/CP_ADAPTIVE_COMPOSE_Carrot_on_Plate_speedx8.mp4' },
+        { task: 'Cube in Toolbox', env: 'Real robot · π₀', base: 40, ours: 50,
+          rephrase: 'ood_prompt/real/cube_in_toolbox/REPHRASE_Cube_in_Toolbox_speedx8.mp4',
+          adaptive: 'ood_prompt/real/cube_in_toolbox/ADAPTIVE_COMPOSE_Cube_in_Toolbox_speedx8.mp4',
+          plot: 'ood_prompt/real/cube_in_toolbox/CP_ADAPTIVE_COMPOSE_Cube_in_Toolbox_speedx8.mp4' }
       ],
       ood_env: [
         { task: 'Toy Dinosaur on Towel', env: 'Simulation · π₀', base: 49.3, ours: 53.3, compose: 46,
@@ -81,18 +91,18 @@
   var DEMO_EXAMPLES = [
     {
       id: 'real', eyebrow: 'Real robot', title: 'Put screwdriver in toolbox',
-      layout: '2x2', blockAspect: '760/690',
+      layout: '2x2', blockAspect: '1440/1080',
       top: [
         { label: 'Rephrase', src: R + 'tape_toolbox_rephrase.mp4' },
         { label: 'Compose-Always', src: R + 'compose_always_screwdriver_toolbox.mp4' }
       ],
-      cam: { label: 'Adaptive steering', src: R + 'compose_adaptive_screwdriver_toolbox.mp4' },
-      plot: { label: 'Failure detection', src: R + 'SAFE_screwdriver_toolbox_crop.mp4' },
+      cam: { label: 'Adaptive steering', src: GVID + 'ood_env/real/screwdriver_in_toolbox/ADAPTIVE_COMPOSE_Ext_Screwdriver_in_Toolbox_speedx5.mp4' },
+      plot: { label: 'Failure detection', src: GVID + 'ood_env/real/screwdriver_in_toolbox/CP_ADAPTIVE_COMPOSE_Screwdriver_in_Toolbox_speedx5.mp4' },
       markers: [
-        { n: 1, t: 1.2, x: 23.6, y: 46.8, title: 'Accurate VLA approach', desc: 'The frozen VLA drives accurate samples toward the screwdriver — failure scores sₜ track below the conformal (CP) band, so RL² stays out of the way.' },
-        { n: 2, t: 2.8, x: 34.6, y: 37.0, title: 'Failure preemptively detected', desc: 'Failure scores cross above the CP band. RL² flags the impending grasp failure via Conformal Prediction — before it happens.' },
-        { n: 3, t: 4.2, x: 45.7, y: 29.6, title: 'Compositional steering', desc: 'RL² composes its RL steering velocity with the VLA, diversifying samples away from the distractor tape and back toward the toolbox opening.' },
-        { n: 4, t: 7.0, x: 64.5, y: 63.0, title: 'Screwdriver placed', desc: 'Failure scores collapse under the band: the corrected trajectory drops the screwdriver into the toolbox. Task succeeds.' }
+        { n: 1, t: 3.6, x: 34.0, y: 37.5, title: 'EEF nears the screwdriver', desc: 'The frozen VLA drives the gripper down onto the screwdriver, but failure scores sₜ climb across the conformal (CP) band — RL² preemptively flags the impending grasp failure.' },
+        { n: 2, t: 5.5, x: 42.0, y: 27.0, title: 'Grasp — steering rejects the distractor', desc: 'Compositional steering diversifies the grasp away from the distractor tape and secures the screwdriver — undistracted while sₜ stays above the band.' },
+        { n: 3, t: 8.5, x: 53.0, y: 36.0, title: 'Lift toward the toolbox', desc: 'Still under RL² steering, the corrected trajectory lifts the screwdriver up and carries it toward the toolbox — undistracted by the surrounding clutter.' },
+        { n: 4, t: 11.3, x: 64.0, y: 68.0, title: 'Placed in the success zone', desc: 'Failure scores collapse back under the CP band as the screwdriver is placed into the toolbox. Task succeeds.' }
       ]
     },
     {
@@ -104,10 +114,10 @@
       cam: { label: 'Adaptive steering', src: SM + 'adaptive_compose_pan_clean.mp4' },
       plot: { label: 'Failure detection', src: SM + 'adaptive_compose_SAFE_pan_clean.mp4' },
       markers: [
-        { n: 1, t: 0.9, x: 16.8, y: 49.7, title: 'VLA grasp attempt', desc: 'The base VLA reaches to grasp the sponge; early failure scores sₜ hover below the CP band as the approach begins.' },
-        { n: 2, t: 3.3, x: 43.9, y: 25.6, title: 'Failure preemptively detected', desc: 'Failure scores climb past the CP band — Conformal Prediction detects the grasp is about to slip before the sponge is lost.' },
-        { n: 3, t: 5.2, x: 64.9, y: 14.5, title: 'Adaptive steering & replanning', desc: 'RL² activates compositional steering, diversifying candidate grasps so the gripper can re-approach and secure the sponge.' },
-        { n: 4, t: 7.2, x: 87.0, y: 39.0, title: 'Sponge grasped', desc: 'After replanning, failure scores fall back under the band — the sponge is grasped and the pan is wiped clean. Task succeeds.' }
+        { n: 1, t: 2.59, x: 33.0, y: 39.0, title: 'Failed grasp', desc: 'The base VLA fumbles the grasp on the brush — failure scores sₜ begin climbing toward the conformal (CP) band as the approach goes wrong.' },
+        { n: 2, t: 4.07, x: 49.0, y: 27.0, title: 'Failure detected', desc: 'Failure scores cross above the CP band. RL² flags the failing grasp via Conformal Prediction and gates on compositional steering.' },
+        { n: 3, t: 5.93, x: 69.0, y: 22.0, title: 'Steering — successful grasp', desc: 'RL² composes its RL steering velocity with the VLA, diversifying candidate grasps until the brush is securely grasped.' },
+        { n: 4, t: 8.15, x: 91.0, y: 64.0, title: 'Undistracted — brush wipes the pan', desc: 'Failure scores fall back under the band: the corrected, undistracted trajectory brings the brush into contact with the pan. Task succeeds.' }
       ]
     }
   ];
@@ -118,7 +128,7 @@
   var BENCH_TABS = [['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['polaris_S', 'π₀.₅ · OOD Prompt'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env']];
 
   /* ---------- state ---------- */
-  var state = { activeBench: 'pi0_indomain_ood_prompt', benchHidden: {}, scalingHidden: {}, galleryTab: 'ood_prompt', grown: false, activeSection: 'overview', lineHover: null };
+  var state = { activeBench: 'pi0_indomain_ood_prompt', benchHidden: {}, scalingHidden: {}, samplesHidden: {}, galleryTab: 'ood_prompt', grown: false, activeSection: 'overview', lineHover: null };
 
   /* ---------- color helpers ---------- */
   function colorFor(n) { if (/adaptive/i.test(n)) return '#1A8341'; if (/compose/i.test(n)) return '#29A9DF'; if (/rephrase/i.test(n)) return '#E27B33'; if (/repeated/i.test(n)) return '#E27B33'; if (/vanilla/i.test(n)) return '#1C6488'; return '#8A8A85'; }
@@ -188,11 +198,11 @@
           onMouseMove: (function (nm, sn, v, col, sd) { return function (e) { showTip(e, nm, [{ name: sn, val: v + '% ± ' + sd, color: col }]); }; })(nm, sn, v, col, sd), onMouseLeave: hideTip }));
         if (sd > 0) {
           var eBot = y(Math.max(0, v - sd)), cap = Math.min(bw * 0.32, 5);
-          els.push(S('line', { x1: ecx, x2: ecx, y1: eTop, y2: eBot, stroke: '#111111', strokeWidth: 1.1, opacity: 0.62 }));
-          els.push(S('line', { x1: ecx - cap, x2: ecx + cap, y1: eTop, y2: eTop, stroke: '#111111', strokeWidth: 1.1, opacity: 0.62 }));
-          els.push(S('line', { x1: ecx - cap, x2: ecx + cap, y1: eBot, y2: eBot, stroke: '#111111', strokeWidth: 1.1, opacity: 0.62 }));
+          els.push(S('line', { 'class': 'bar-anno', x1: ecx, x2: ecx, y1: eTop, y2: eBot, stroke: '#111111', strokeWidth: 1.1, 'stroke-opacity': 0.62 }));
+          els.push(S('line', { 'class': 'bar-anno', x1: ecx - cap, x2: ecx + cap, y1: eTop, y2: eTop, stroke: '#111111', strokeWidth: 1.1, 'stroke-opacity': 0.62 }));
+          els.push(S('line', { 'class': 'bar-anno', x1: ecx - cap, x2: ecx + cap, y1: eBot, y2: eBot, stroke: '#111111', strokeWidth: 1.1, 'stroke-opacity': 0.62 }));
         }
-        if (state.grown) els.push(S('text', { x: bx + bw / 2, y: labelY, textAnchor: 'middle', fontSize: 8.5, fontFamily: "'Chakra Petch'", fill: ours ? '#1A8341' : '#525252', fontWeight: ours ? 700 : 600 }, [v]));
+        if (state.grown) els.push(S('text', { 'class': 'bar-anno', x: bx + bw / 2, y: labelY, textAnchor: 'middle', fontSize: 8.5, fontFamily: "'Chakra Petch'", fill: ours ? '#1A8341' : '#525252', fontWeight: ours ? 700 : 600 }, [v]));
       });
       wrap(nm, 13).forEach(function (ln, li) { els.push(S('text', { x: m.l + gi * gw + gw / 2, y: m.t + ph + 19 + li * 13, textAnchor: 'middle', fontSize: 11, fill: '#404040', fontFamily: "'DM Sans'" }, [ln])); });
     });
@@ -274,6 +284,53 @@
     });
     var cf = $('scaling-chart-failure'); clear(cf); cf.appendChild(lineChart(scalingCfg(0)));
     var cs = $('scaling-chart-success'); clear(cs); cs.appendChild(lineChart(scalingCfg(1)));
+  }
+
+  /* ---------- combined scaling (samples × rephrases) horizontal bar chart ---------- */
+  function hbarChart(cfg) {
+    var W = 800, H = 360, m = { l: 128, r: 122, t: 8, b: 40 };
+    var pw = W - m.l - m.r, ph = H - m.t - m.b, ymax = cfg.ymax, ng = cfg.groups.length, ns = cfg.series.length;
+    var x = function (v) { return m.l + (v / ymax) * pw; }, els = [];
+    for (var t = 0; t <= ymax; t += 10) { var xx = x(t);
+      els.push(S('line', { x1: xx, x2: xx, y1: m.t, y2: m.t + ph, stroke: 'rgba(17,17,17,0.09)', strokeWidth: 1 }));
+      els.push(S('text', { x: xx, y: m.t + ph + 20, textAnchor: 'middle', fontSize: 11, fill: '#737373', fontFamily: "'Chakra Petch'" }, [t])); }
+    els.push(S('text', { x: m.l + pw / 2, y: H - 2, textAnchor: 'middle', fontSize: 11, fill: '#404040', fontFamily: "'DM Sans'" }, ['Success Rate (%)']));
+    var gh = ph / ng;
+    cfg.groups.forEach(function (grp, gi) {
+      var gy0 = m.t + gi * gh, gpad = gh * 0.11, bgap = 4, bh = (gh - 2 * gpad - (ns - 1) * bgap) / ns, gyc = gy0 + gh / 2;
+      var lines = wrap(grp.name, 16);
+      lines.forEach(function (ln, li) { els.push(S('text', { x: m.l - 12, y: gyc - (lines.length - 1) * 9 + li * 18 + 4, textAnchor: 'end', fontSize: 12.5, fontFamily: "'DM Sans'", fontWeight: 600, fill: '#111111' }, [ln])); });
+      grp.vals.forEach(function (v, si) {
+        var sn = cfg.series[si]; if (state.samplesHidden[sn]) return;
+        var by = gy0 + gpad + si * (bh + bgap), col = cfg.colors[si], sd = grp.std[si], yc = by + bh / 2;
+        els.push(S('rect', { 'class': 'hbar', x: m.l, y: by, width: Math.max(1, x(v) - m.l), height: bh, rx: 2.5, fill: col, style: { cursor: 'pointer' },
+          onMouseMove: (function (v, sn, col, sd) { return function (e) { showTip(e, grp.name, [{ name: sn, val: v.toFixed(1) + '% ± ' + sd.toFixed(1), color: col }]); }; })(v, sn, col, sd), onMouseLeave: hideTip }));
+        if (sd > 0) { var xl = x(Math.max(0, v - sd)), xr = x(Math.min(ymax, v + sd)), cap = Math.min(bh * 0.32, 6);
+          els.push(S('line', { 'class': 'hbar-anno', x1: xl, x2: xr, y1: yc, y2: yc, stroke: '#111111', strokeWidth: 1.2, 'stroke-opacity': 0.62 }));
+          els.push(S('line', { 'class': 'hbar-anno', x1: xl, x2: xl, y1: yc - cap, y2: yc + cap, stroke: '#111111', strokeWidth: 1.2, 'stroke-opacity': 0.62 }));
+          els.push(S('line', { 'class': 'hbar-anno', x1: xr, x2: xr, y1: yc - cap, y2: yc + cap, stroke: '#111111', strokeWidth: 1.2, 'stroke-opacity': 0.62 })); }
+        els.push(S('text', { 'class': 'hbar-anno', x: x(Math.min(ymax, v + sd)) + 6, y: yc + 3.5, textAnchor: 'start', fontSize: 9.5, fontFamily: "'Chakra Petch'", fontWeight: 600, fill: '#525252' }, [v.toFixed(1)]));
+      });
+      var ax = m.l + pw + 20, ty = gyc - 20, tx = ax + 28;
+      els.push(S('line', { 'class': 'hbar-anno', x1: ax, x2: tx, y1: gyc + 20, y2: ty, stroke: grp.gainColor, strokeWidth: 2.6, strokeLinecap: 'round' }));
+      els.push(S('polygon', { 'class': 'hbar-anno', points: tx + ',' + ty + ' ' + (tx - 11) + ',' + (ty + 3) + ' ' + (tx - 4) + ',' + (ty + 11), fill: grp.gainColor }));
+      els.push(S('text', { 'class': 'hbar-anno', x: tx + 8, y: gyc + 5, textAnchor: 'start', fontSize: 14, fontFamily: "'Chakra Petch'", fontWeight: 700, fill: grp.gainColor }, ['+' + grp.gain.toFixed(1) + '%']));
+    });
+    els.push(S('line', { x1: m.l, x2: m.l + pw, y1: m.t + ph, y2: m.t + ph, stroke: '#111111', strokeWidth: 1.5 }));
+    return h('div', { style: { width: '100%' } }, [S('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', style: { display: 'block', overflow: 'visible' } }, els)]);
+  }
+  function renderScalingSamples() {
+    var cfg = DATA.scalingSamples, leg = $('scaling-samples-legend'); if (!leg) return;
+    clear(leg);
+    cfg.series.forEach(function (n, i) {
+      leg.appendChild(h('button', { onClick: function () { state.samplesHidden[n] = !state.samplesHidden[n]; renderScalingSamples(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '7px', background: 'none', border: 'none', padding: '2px 0', opacity: state.samplesHidden[n] ? '0.34' : '1' } }, [
+        h('span', { style: { width: '12px', height: '12px', background: cfg.colors[i] } }),
+        h('span', { style: { fontFamily: "'DM Sans'", fontSize: '12.5px', color: '#222222' } }, [n])
+      ]));
+    });
+    var host = $('scaling-samples-chart'); if (!host) return; clear(host);
+    host.className = 'samples-grown';
+    host.appendChild(hbarChart(cfg));
   }
 
   var galleryVids = [], galleryIO = null, galleryTimer = null;
@@ -595,6 +652,32 @@
     requestAnimationFrame(demoTick);
   }
 
+  /* ---------- scaling views carousel (test-time scaling laws + combined samples) ---------- */
+  function initScalingCarousel() {
+    var SLIDES = [
+      { title: 'Test-time scaling laws', sub: 'Fitted power law <em>e</em> &asymp; a&middot;k<sup>b</sup> &middot; oracle action error vs. action samples (k)' },
+      { title: 'Combined test-time scaling', sub: 'Success rate (%)' }
+    ];
+    var n = SLIDES.length, idx = 0;
+    var titleEl = $('scaling-title'), subEl = $('scaling-sub'), counter = $('scaling-counter');
+    if (!titleEl) return;
+    function render() {
+      titleEl.innerHTML = SLIDES[idx].title;
+      subEl.innerHTML = SLIDES[idx].sub;
+      if (counter) counter.textContent = (idx + 1) + ' / ' + n;
+      for (var i = 0; i < n; i++) {
+        var s = $('scaling-slide-' + i); if (s) s.style.display = i === idx ? '' : 'none';
+        var c = $('scaling-cap-' + i); if (c) c.style.display = i === idx ? '' : 'none';
+      }
+      if (idx === 1) renderScalingSamples();
+    }
+    function go(d) { idx = (idx + d + n) % n; render(); }
+    var pv = $('scaling-prev'), nx = $('scaling-next');
+    if (pv) pv.addEventListener('click', function () { go(-1); });
+    if (nx) nx.addEventListener('click', function () { go(1); });
+    render();
+  }
+
   /* ---------- bibtex ---------- */
   function initBibtex() {
     $('bibtex-pre').textContent = BIBTEX;
@@ -644,6 +727,7 @@
     renderToc();
     renderBench();
     renderScaling();
+    initScalingCarousel();
     renderGallery();
     archRenderFrames(); archRender(); archSchedule(ARCH_DUR);
     $('arch-pause').addEventListener('click', archTogglePause);
