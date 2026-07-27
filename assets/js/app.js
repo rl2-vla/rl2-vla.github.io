@@ -34,9 +34,9 @@
       series: ['8 Rephrases × 5 Samples', '40× Samples', '1× Sample'],
       colors: ['#7D2184', '#A02B93', '#C8A4C2'],
       groups: [
-        { name: 'RL² (Compose-Adaptive)', vals: [60.4, 47.4, 44.6], std: [1.6, 3.8, 1.4], gain: 15.8, gainColor: '#1A8341' },
-        { name: 'RL² (Compose-Always)', vals: [57.9, 43.7, 39.2], std: [1.6, 1.9, 3.8], gain: 18.7, gainColor: '#29A9DF' },
-        { name: 'Repeated / Rephrase', vals: [50.2, 42.1, 40.2], std: [4.7, 0.5, 0.8], gain: 10.0, gainColor: '#E27B33' }
+        { name: 'RL² (Compose-Adaptive)', vals: [60.3, 47.3, 44.5], std: [1.6, 3.8, 1.3], gain: 15.8, gainColor: '#1A8341' },
+        { name: 'RL² (Compose-Always)', vals: [57.8, 43.7, 39.2], std: [1.6, 1.9, 3.8], gain: 18.6, gainColor: '#29A9DF' },
+        { name: 'Repeated / Rephrase', vals: [50.2, 42, 40.2], std: [4.6, 0.0, 0.8], gain: 10.0, gainColor: '#E27B33' }
       ]
     },
     gallery: {
