@@ -90,7 +90,7 @@
   var R = 'assets/images/fig2_real/', SM = 'assets/images/fig2_sim/';
   var DEMO_EXAMPLES = [
     {
-      id: 'real', eyebrow: 'Real robot', title: 'Put screwdriver in toolbox',
+      id: 'real', eyebrow: 'Real robot · OOD environment', title: 'Put screwdriver in toolbox', tag: 'OOD Env',
       layout: '2x2', blockAspect: '1440/1080',
       top: [
         { label: 'Rephrase', src: R + 'tape_toolbox_rephrase.mp4' },
@@ -106,7 +106,7 @@
       ]
     },
     {
-      id: 'sim', eyebrow: 'Simulation · PolaRiS', title: 'Pan cleaning',
+      id: 'sim', eyebrow: 'Simulation · PolaRiS · OOD prompt', title: 'Pan cleaning', tag: 'OOD Prompt',
       layout: '1+2', blockAspect: '16/9',
       top: [
         { label: 'Rephrase', src: SM + 'rephrase_pan_clean_polaris.mp4' }
@@ -125,7 +125,7 @@
   var BIBTEX = '@article{tan2026rl2vla,\n  title   = {RL^2-VLA: Adaptive RL Latent Compositional Steering with Test-Time\n             Scaling for Vision-Language-Action Models},\n  author  = {Tan, Derek Ming Siang and Shailesh, Shailesh and Iyer, Srikrishna and\n             Teo, William Wei Jie and Ju, Yuanliang and Gu, Qiao and Sartoretti, Guillaume},\n  year    = {2026},\n  journal = {arXiv preprint}\n}';
 
   var TOC = [['overview', 'Overview'], ['abstract', 'Abstract'], ['demo', 'RL² in Action'], ['method', 'Method'], ['results', 'Results'], ['gallery', 'Task Gallery'], ['bibtex', 'BibTeX']];
-  var BENCH_TABS = [['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['polaris_S', 'π₀.₅ · OOD Prompt'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env'], ['combined_scaling', 'π₀ · Combined Scaling']];
+  var BENCH_TABS = [['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['polaris_S', 'π₀.₅ · OOD Prompt'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env']];
 
   /* ---------- state ---------- */
   var state = { activeBench: 'pi0_indomain_ood_prompt', benchHidden: {}, scalingHidden: {}, samplesHidden: {}, galleryTab: 'ood_prompt', grown: false, activeSection: 'overview', lineHover: null };
@@ -254,41 +254,39 @@
   }
 
   function renderBench() {
-    var combined = state.activeBench === 'combined_scaling';
-    var bench = combined ? null : DATA.benchmarks[state.activeBench];
-    $('bench-title').textContent = combined ? 'Combined test-time scaling' : bench.title;
-    var cap = $('bench-cap'); if (cap) cap.style.display = combined ? '' : 'none';
+    var bench = DATA.benchmarks[state.activeBench];
+    $('bench-title').textContent = bench.title;
     var tabs = $('bench-tabs'); clear(tabs);
     BENCH_TABS.forEach(function (t) {
       var id = t[0], a = id === state.activeBench;
       tabs.appendChild(h('button', { 'data-id': id, onClick: function () { state.activeBench = id; renderBench(); }, style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '10.5px', fontWeight: '500', letterSpacing: '0.04em', textTransform: 'uppercase', padding: '8px 11px', background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111', border: '1px solid #111111', borderRadius: '8px', transition: 'all .2s' } }, [t[1]]));
     });
     var ser = $('bench-series'); clear(ser);
-    if (combined) {
-      var sc = DATA.scalingSamples;
-      sc.series.forEach(function (n, i) {
-        ser.appendChild(h('button', { onClick: function () { state.samplesHidden[n] = !state.samplesHidden[n]; renderBench(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', padding: '2px 0', opacity: state.samplesHidden[n] ? '0.34' : '1' } }, [
-          h('span', { style: { width: '12px', height: '12px', background: sc.colors[i] } }),
-          h('span', { style: { fontFamily: "'DM Sans'", fontSize: '12.5px', color: '#222222' } }, [n])
-        ]));
-      });
-    } else {
-      bench.series.forEach(function (n) {
-        var col = colorFor(n);
-        ser.appendChild(h('button', { onClick: function () { state.benchHidden[n] = !state.benchHidden[n]; renderBench(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', padding: '2px 0', opacity: state.benchHidden[n] ? '0.34' : '1' } }, [
-          h('span', { style: { width: '12px', height: '12px', background: col } }),
-          h('span', { style: { fontFamily: "'DM Sans'", fontSize: '12.5px', color: '#222222' } }, [n])
-        ]));
-      });
-    }
+    bench.series.forEach(function (n) {
+      var col = colorFor(n);
+      ser.appendChild(h('button', { onClick: function () { state.benchHidden[n] = !state.benchHidden[n]; renderBench(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', padding: '2px 0', opacity: state.benchHidden[n] ? '0.34' : '1' } }, [
+        h('span', { style: { width: '12px', height: '12px', background: col } }),
+        h('span', { style: { fontFamily: "'DM Sans'", fontSize: '12.5px', color: '#222222' } }, [n])
+      ]));
+    });
     var chart = $('bench-chart'); clear(chart);
-    if (combined) {
-      chart.className = state.grown ? 'samples-grown' : '';
-      chart.appendChild(hbarChart(DATA.scalingSamples));
-    } else {
-      chart.className = state.grown ? 'bench-grown' : '';
-      chart.appendChild(barChart({ tasks: bench.tasks, series: bench.series, ymax: bench.ymax, std: bench.std }));
-    }
+    chart.className = state.grown ? 'bench-grown' : '';
+    chart.appendChild(barChart({ tasks: bench.tasks, series: bench.series, ymax: bench.ymax, std: bench.std }));
+  }
+
+  /* combined test-time scaling — its own block under the benchmark card */
+  function renderSamples() {
+    var sc = DATA.scalingSamples, legend = $('samples-legend'); if (!legend) return;
+    clear(legend);
+    sc.series.forEach(function (n, i) {
+      legend.appendChild(h('button', { onClick: function () { state.samplesHidden[n] = !state.samplesHidden[n]; renderSamples(); }, style: { cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', padding: '2px 0', opacity: state.samplesHidden[n] ? '0.34' : '1' } }, [
+        h('span', { style: { width: '12px', height: '12px', background: sc.colors[i] } }),
+        h('span', { style: { fontFamily: "'DM Sans'", fontSize: '12.5px', color: '#222222' } }, [n])
+      ]));
+    });
+    var chart = $('samples-chart'); clear(chart);
+    chart.className = state.grown ? 'samples-grown' : '';
+    chart.appendChild(hbarChart(sc));
   }
 
   function renderScaling() {
@@ -337,13 +335,36 @@
     return h('div', { style: { width: '100%' } }, [S('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', style: { display: 'block', overflow: 'visible' } }, els)]);
   }
   var galleryVids = [], galleryIO = null, galleryTimer = null;
+  var GALLERY_AUTO_MS = 12000, GALLERY_STALL_MS = 8000;
+  var galleryRemain = GALLERY_AUTO_MS, galleryLast = 0, galleryStall = 0;
   function galleryInView() { var g = $('gallery'); if (!g) return false; var r = g.getBoundingClientRect(), vh = window.innerHeight || 800; return r.bottom > vh * 0.15 && r.top < vh * 0.85; }
+  function galleryPlaying() {
+    for (var i = 0; i < galleryVids.length; i++) { var v = galleryVids[i]; if (v && !v.paused && !v.ended && v.currentTime > 0) return true; }
+    return false;
+  }
+  // The tab's turn is measured in *watch* time, not wall-clock time: the clock only
+  // advances while the gallery is on screen and its clips are actually rolling.
+  // Otherwise the seconds spent scrolling down the page (or on a hidden tab) burn
+  // the turn and the videos get cut off part-way through.
   function scheduleGalleryAuto() {
-    clearTimeout(galleryTimer);
-    galleryTimer = setTimeout(function () {
-      if (galleryInView()) { state.galleryTab = (state.galleryTab === 'ood_prompt') ? 'ood_env' : 'ood_prompt'; renderGallery(); }
-      else scheduleGalleryAuto();
-    }, 12000);
+    clearInterval(galleryTimer);
+    galleryRemain = GALLERY_AUTO_MS; galleryStall = 0; galleryLast = performance.now();
+    galleryTimer = setInterval(function () {
+      var now = performance.now(), dt = now - galleryLast;
+      galleryLast = now;
+      if (document.hidden || !galleryInView()) { galleryStall = 0; return; }
+      if (!galleryPlaying()) {
+        // safety net: never wedge the rotation on a clip that fails to load
+        galleryStall += dt;
+        if (galleryStall < GALLERY_STALL_MS) return;
+      } else galleryStall = 0;
+      galleryRemain -= dt;
+      if (galleryRemain <= 0) {
+        clearInterval(galleryTimer);
+        state.galleryTab = (state.galleryTab === 'ood_prompt') ? 'ood_env' : 'ood_prompt';
+        renderGallery();
+      }
+    }, 250);
   }
   function renderGallery() {
     var tab = state.galleryTab;
@@ -646,8 +667,9 @@
     var tabs = $('demo-tabs'); if (!tabs) return; clear(tabs);
     DEMO_EXAMPLES.forEach(function (ex, i) {
       var a = i === demo.ex;
-      tabs.appendChild(h('button', { 'aria-label': 'Show ' + ex.title, onClick: (function (idx) { return function () { if (idx !== demo.ex) { demo.ex = idx; renderDemo(); } }; })(i),
-        style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 15px', border: 'none', borderRight: i < DEMO_EXAMPLES.length - 1 ? '1px solid #111111' : 'none', background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111', whiteSpace: 'nowrap', transition: 'all .2s' } }, [ex.title]));
+      tabs.appendChild(h('button', { 'aria-label': 'Show ' + ex.tag + ' example: ' + ex.title, onClick: (function (idx) { return function () { if (idx !== demo.ex) { demo.ex = idx; renderDemo(); } }; })(i),
+        style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 15px', border: 'none', borderRight: i < DEMO_EXAMPLES.length - 1 ? '1px solid #111111' : 'none', background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111', whiteSpace: 'nowrap', transition: 'all .2s' },
+        html: '<span style="font-weight:700;color:' + (a ? '#7BE0A3' : '#1A8341') + '">' + ex.tag + '</span> <span style="opacity:.4">&middot;</span> ' + ex.title }));
     });
   }
   function initDemo() {
@@ -675,9 +697,9 @@
       document.querySelectorAll('[data-sec]').forEach(function (el) { rev.observe(el); });
     } catch (e) { document.querySelectorAll('[data-sec]').forEach(function (el) { el.classList.add('in'); }); }
     try {
-      var io = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting) { state.grown = true; renderBench(); io.disconnect(); } }); }, { threshold: 0.12 });
-      var el = $('results'); if (el) io.observe(el); else { state.grown = true; renderBench(); }
-    } catch (e) { state.grown = true; renderBench(); }
+      var io = new IntersectionObserver(function (es) { es.forEach(function (en) { if (en.isIntersecting) { state.grown = true; renderBench(); renderSamples(); io.disconnect(); } }); }, { threshold: 0.12 });
+      var el = $('results'); if (el) io.observe(el); else { state.grown = true; renderBench(); renderSamples(); }
+    } catch (e) { state.grown = true; renderBench(); renderSamples(); }
     try {
       var spy = new IntersectionObserver(function (es) { var vis = es.filter(function (e) { return e.isIntersecting; }).sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; }); if (vis[0]) { state.activeSection = vis[0].target.id; renderToc(); } }, { rootMargin: '-18% 0px -70% 0px', threshold: 0 });
       TOC.forEach(function (t) { var s = $(t[0]); if (s) spy.observe(s); });
@@ -706,6 +728,7 @@
     TT.box = $('tooltip'); TT.title = $('tooltip-title'); TT.rows = $('tooltip-rows');
     renderToc();
     renderBench();
+    renderSamples();
     renderScaling();
     renderGallery();
     archRenderFrames(); archRender(); archSchedule(ARCH_DUR);
@@ -728,7 +751,7 @@
     ['scaling-chart-failure', 'scaling-chart-success'].forEach(function (id) {
       var el = $(id); if (el) el.addEventListener('mouseleave', clearLineTip);
     });
-    var bc = $('bench-chart'); if (bc) bc.addEventListener('mouseleave', hideTip);
+    ['bench-chart', 'samples-chart'].forEach(function (id) { var el = $(id); if (el) el.addEventListener('mouseleave', hideTip); });
     window.addEventListener('scroll', function () {
       if (TT.box && TT.box.style.display === 'block') { clearLineTip(); }
     }, { passive: true });
