@@ -13,10 +13,10 @@
       pi0_ood_env: { title: 'π₀ · Out-of-Domain SIMPLER Environments', ymax: 70, series: ['Vanilla', 'Rephrase', 'RL² (Compose-Always)', 'RL² (Compose-Adaptive)'],
         tasks: { 'Orange Juice on Plate': [31.3, 35.3, 41.3, 43.3], 'Spoon on Towel (Google)': [46.0, 44.7, 54.0, 59.3], 'Tape Measure in Basket': [18.7, 52.0, 44.7, 59.3], 'Toy Dinosaur on Towel': [48.0, 49.3, 46.0, 53.3], 'Average': [36.0, 45.3, 46.5, 53.8] },
         std: { 'Orange Juice on Plate': [2.3, 6.4, 6.1, 8.1], 'Spoon on Towel (Google)': [2.3, 3.1, 4.0, 6.4], 'Tape Measure in Basket': [8.3, 3.1, 3.5, 6.4], 'Toy Dinosaur on Towel': [3.5, 3.1, 3.5, 6.4], 'Average': [0.5, 1.5, 1.8, 3.2] } },
-      polaris_S: { title: 'π₀.₅ · OOD Prompt', ymax: 80, series: ['Vanilla', 'Rephrase', 'RL² (Compose)', 'RL² (Adaptive)'],
+      polaris_S: { title: 'π₀.₅ · PolaRiS (OOD Prompt)', ymax: 80, series: ['Vanilla', 'Rephrase', 'RL² (Compose-Always)', 'RL² (Compose-Adaptive)'],
         tasks: { 'Move Latte Cup': [18.7, 48.7, 55.3, 66.0], 'Tape into Container': [12.7, 22.0, 22.0, 28.7], 'Pan Cleaning': [11.5, 24.7, 24.0, 33.3], 'Average': [14.3, 31.8, 33.8, 42.7] },
         std: { 'Move Latte Cup': [2.3, 11.0, 3.1, 3.5], 'Tape into Container': [3.0, 5.3, 5.3, 1.2], 'Pan Cleaning': [4.3, 8.1, 4.0, 7.0], 'Average': [2.0, 3.4, 1.7, 2.3] } },
-      polaris_P: { title: 'PolaRiS · OOD Prompt — Progress Rate', ymax: 80, series: ['Vanilla', 'Rephrase', 'RL² (Compose)', 'RL² (Adaptive)'],
+      polaris_P: { title: 'PolaRiS · OOD Prompt — Progress Rate', ymax: 80, series: ['Vanilla', 'Rephrase', 'RL² (Compose-Always)', 'RL² (Compose-Adaptive)'],
         tasks: { 'Move Latte Cup': [39.5, 65.6, 72.0, 78.0], 'Tape into Container': [34.6, 41.3, 40.9, 46.9], 'Pan Cleaning': [45.7, 58.7, 54.4, 64.0], 'Average': [40.0, 55.2, 55.8, 63.0] } },
       real_indomain: { title: 'Real Robot · In-Domain (OOD Prompt)', ymax: 80, series: ['Vanilla', 'Rephrase', 'RL² (Compose-Always)', 'RL² (Compose-Adaptive)'],
         tasks: { 'Carrot on Plate': [13.3, 36.7, 40, 63.3], 'Cube in Toolbox': [3.3, 40, 50, 50], 'Average': [8.3, 38.4, 45.0, 56.7] },
@@ -34,8 +34,8 @@
       series: ['8 Rephrases × 5 Samples', '40× Samples', '1× Sample'],
       colors: ['#7D2184', '#A02B93', '#C8A4C2'],
       groups: [
-        { name: 'RL² (Compose-Adaptive)', vals: [60.3, 47.3, 44.5], std: [1.6, 3.8, 1.3], gain: 15.8, gainColor: '#1A8341' },
-        { name: 'RL² (Compose-Always)', vals: [57.8, 43.7, 39.2], std: [1.6, 1.9, 3.8], gain: 18.6, gainColor: '#29A9DF' },
+        { name: 'RL² \n(Compose\nAdaptive)', vals: [60.3, 47.3, 44.5], std: [1.6, 3.8, 1.3], gain: 15.8, gainColor: '#1A8341' },
+        { name: 'RL² \n(Compose\nAlways)', vals: [57.8, 43.7, 39.2], std: [1.6, 1.9, 3.8], gain: 18.6, gainColor: '#29A9DF' },
         { name: 'Repeated / Rephrase', vals: [50.2, 42, 40.2], std: [4.6, 0.0, 0.8], gain: 10.0, gainColor: '#E27B33' }
       ]
     },
@@ -82,8 +82,8 @@
   var ARCH_DUR = 4500;
   var ARCH_FRAMES = [
     { src: 'assets/images/workflow_1.jpeg', title: 'Standard VLA Inference', caption: 'Run standard inference with the frozen off-the-shelf VLA (OpenVLA*, π₀/π₀.₅) to produce base action candidates and expressive action-expert latents eₜ.' },
-    { src: 'assets/images/workflow_2.jpeg', title: 'RL Compositional Steering', caption: 'An RL action expert generates a steering velocity V_RL, composed with the VLA velocity V_VLA during flow-matching — diversifying candidate actions toward success.' },
-    { src: 'assets/images/workflow_3.jpeg', title: 'SAFE Failure Detection', caption: 'A lightweight detector reads the latents and predicts failure (sₜ > δ), gating steering so compositional sampling activates only when the base VLA is likely to fail.' },
+    { src: 'assets/images/workflow_2.jpeg', title: 'RL Compositional Steering', caption: 'An RL action expert generates steering velocity V_RL, composed with the VLA velocity V_VLA during flow-matching (*autoregressive VLAs uses Gaussian Perturbation for steering).' },
+    { src: 'assets/images/workflow_3.jpeg', title: 'SAFE Failure Detection', caption: 'A lightweight failure detector detects failure when failure score exceeds CP band threshold, adaptively steering only when the base VLA is likely to fail.' },
     { src: 'assets/images/workflow_4.jpeg', title: 'Action Verification', caption: 'A verifier VLM (RoboMonkey / CoVer) scores the composed action candidates and selects the best action â* to execute on the robot.' }
   ];
 
@@ -99,10 +99,10 @@
       cam: { label: 'Adaptive steering', src: GVID + 'ood_env/real/screwdriver_in_toolbox/ADAPTIVE_COMPOSE_Ext_Screwdriver_in_Toolbox_speedx5.mp4' },
       plot: { label: 'Failure detection', src: GVID + 'ood_env/real/screwdriver_in_toolbox/CP_ADAPTIVE_COMPOSE_Screwdriver_in_Toolbox_speedx5.mp4' },
       markers: [
-        { n: 1, t: 3.6, x: 34.0, y: 37.5, title: 'EEF nears the screwdriver', desc: 'The frozen VLA drives the gripper down onto the screwdriver, but failure scores sₜ climb across the conformal (CP) band — RL² preemptively flags the impending grasp failure.' },
-        { n: 2, t: 5.5, x: 42.0, y: 27.0, title: 'Grasp — steering rejects the distractor', desc: 'Compositional steering diversifies the grasp away from the distractor tape and secures the screwdriver — undistracted while sₜ stays above the band.' },
-        { n: 3, t: 8.5, x: 53.0, y: 36.0, title: 'Lift toward the toolbox', desc: 'Still under RL² steering, the corrected trajectory lifts the screwdriver up and carries it toward the toolbox — undistracted by the surrounding clutter.' },
-        { n: 4, t: 11.3, x: 64.0, y: 68.0, title: 'Placed in the success zone', desc: 'Failure scores collapse back under the CP band as the screwdriver is placed into the toolbox. Task succeeds.' }
+        { n: 1, t: 3.6, x: 34.0, y: 37.5, title: 'Base VLA actions', desc: 'RL² relies on base VLA to move towards the screwdriver. Failure scores starts to flag the impending grasp failure.' },
+        { n: 2, t: 5.5, x: 42.0, y: 27.0, title: 'RL² Steering - Grasp', desc: 'Compositional steering diversifies the grasp away from the distractor tape and towards the screwdriver.' },
+        { n: 3, t: 8.5, x: 53.0, y: 36.0, title: 'RL² Steering - Lift', desc: 'RL² steering lifts the screwdriver up and carries it toward the toolbox while remaining undistracted.' },
+        { n: 4, t: 11.3, x: 64.0, y: 68.0, title: 'Task success', desc: 'Screwdriver is placed into the toolbox and failure scores drop back under the CP band. Task succeeds.' }
       ]
     },
     {
@@ -114,10 +114,10 @@
       cam: { label: 'Adaptive steering', src: SM + 'adaptive_compose_pan_clean.mp4' },
       plot: { label: 'Failure detection', src: SM + 'adaptive_compose_SAFE_pan_clean.mp4' },
       markers: [
-        { n: 1, t: 2.59, x: 33.0, y: 39.0, title: 'Failed grasp', desc: 'The base VLA fumbles the grasp on the brush — failure scores sₜ begin climbing toward the conformal (CP) band as the approach goes wrong.' },
-        { n: 2, t: 4.07, x: 49.0, y: 27.0, title: 'Failure detected', desc: 'Failure scores cross above the CP band. RL² flags the failing grasp via Conformal Prediction and gates on compositional steering.' },
-        { n: 3, t: 5.93, x: 69.0, y: 22.0, title: 'Steering — successful grasp', desc: 'RL² composes its RL steering velocity with the VLA, diversifying candidate grasps until the brush is securely grasped.' },
-        { n: 4, t: 8.15, x: 91.0, y: 64.0, title: 'Undistracted — brush wipes the pan', desc: 'Failure scores fall back under the band: the corrected, undistracted trajectory brings the brush into contact with the pan. Task succeeds.' }
+        { n: 1, t: 2.59, x: 33.0, y: 39.0, title: 'Base VLA - Failed grasp', desc: 'The base VLA initially fails to grasp the sponge. Failure scores increases upon repeated failures.' },
+        { n: 2, t: 4.07, x: 49.0, y: 27.0, title: 'Failure detected', desc: 'Failure detected when failure scores cross the CP band. RL² starts to apply compositional steering.' },
+        { n: 3, t: 5.93, x: 69.0, y: 22.0, title: 'RL² Steering — successful grasp', desc: 'RL² steers the VLA towards diverse candidate grasps until the sponge is securely grasped.' },
+        { n: 4, t: 8.15, x: 91.0, y: 64.0, title: 'Task Success', desc: 'The sponge brushes against the pan for cleaning and failure scores drop back under the CP band. Task succeeds.' }
       ]
     }
   ];
@@ -125,10 +125,10 @@
   var BIBTEX = '@article{tan2026rl2vla,\n  title   = {RL^2-VLA: Adaptive RL Latent Compositional Steering with Test-Time\n             Scaling for Vision-Language-Action Models},\n  author  = {Tan, Derek Ming Siang and Shailesh, Shailesh and Iyer, Srikrishna and\n             Teo, William Wei Jie and Ju, Yuanliang and Gu, Qiao and Sartoretti, Guillaume},\n  year    = {2026},\n  journal = {arXiv preprint}\n}';
 
   var TOC = [['overview', 'Overview'], ['abstract', 'Abstract'], ['demo', 'RL² in Action'], ['method', 'Method'], ['results', 'Results'], ['gallery', 'Task Gallery'], ['bibtex', 'BibTeX']];
-  var BENCH_TABS = [['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['polaris_S', 'π₀.₅ · OOD Prompt'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env']];
+  var BENCH_TABS = [['polaris_S', 'π₀.₅ · OOD Prompt'], ['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env']];
 
   /* ---------- state ---------- */
-  var state = { activeBench: 'pi0_indomain_ood_prompt', benchHidden: {}, scalingHidden: {}, samplesHidden: {}, galleryTab: 'ood_prompt', grown: false, activeSection: 'overview', lineHover: null };
+  var state = { activeBench: 'polaris_S', benchHidden: {}, scalingHidden: {}, samplesHidden: {}, galleryTab: 'ood_prompt', grown: false, activeSection: 'overview', lineHover: null };
 
   /* ---------- color helpers ---------- */
   function colorFor(n) { if (/adaptive/i.test(n)) return '#1A8341'; if (/compose/i.test(n)) return '#29A9DF'; if (/rephrase/i.test(n)) return '#E27B33'; if (/repeated/i.test(n)) return '#E27B33'; if (/vanilla/i.test(n)) return '#1C6488'; return '#8A8A85'; }
@@ -157,7 +157,7 @@
   function S(tag, attrs, kids) { return make(true, tag, attrs, kids); }
   function $(id) { return document.getElementById(id); }
   function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
-  function wrap(s, max) { var w = String(s).split(' '), lines = [], cur = ''; w.forEach(function (x) { if ((cur + ' ' + x).trim().length > max) { if (cur) lines.push(cur); cur = x; } else cur = (cur ? cur + ' ' : '') + x; }); if (cur) lines.push(cur); return lines.slice(0, 2); }
+  function wrap(s, max) { var w = String(s).split(' '), lines = [], cur = ''; w.forEach(function (x) { if ((cur + ' ' + x).trim().length > max) { if (cur) lines.push(cur); cur = x; } else cur = (cur ? cur + ' ' : '') + x; }); if (cur) lines.push(cur); return lines.slice(0, 3); }
   function scaler(dom, rng, log) { var d0 = dom[0], d1 = dom[1], r0 = rng[0], r1 = rng[1]; if (log) { var l0 = Math.log10(d0), l1 = Math.log10(d1); return function (v) { return r0 + ((Math.log10(v) - l0) / (l1 - l0)) * (r1 - r0); }; } return function (v) { return r0 + ((v - d0) / (d1 - d0)) * (r1 - r0); }; }
   function buildScale(dict, ks) { return Object.keys(dict).map(function (name) { return { name: name, color: scaleColor(name), dash: scaleDash(name), width: /ours/i.test(name) ? 3.2 : 1.7, data: ks.map(function (k) { return [k, dict[name][0] * Math.pow(k, dict[name][1])]; }) }; }); }
 
@@ -240,8 +240,8 @@
   var KS = []; for (var _i = 0; _i <= 50; _i++) KS.push(Math.pow(10, (_i / 50) * 3));
   var XF = function (v) { return ({ 1: '1', 10: '10', 100: '100', 1000: '1000' })[Math.round(v)] || ''; };
   function scalingCfg(idx) {
-    if (idx === 0) return { id: 'sf', series: buildScale(DATA.scaling.failure, KS), hiddenMap: state.scalingHidden, xDomain: [1, 1000], yDomain: [0.18, 0.42], xLog: true, yLog: false, xTicks: [1, 10, 100, 1000], yTicks: [0.20, 0.25, 0.30, 0.35, 0.40], xLabel: 'Action samples (k)', yLabel: 'Oracle action error', xfmt: XF, yfmt: function (v) { return v.toFixed(2); }, tipfmt: function (v) { return v.toFixed(3); }, tipTitle: function (v) { return 'k ≈ ' + Math.round(v); } };
-    return { id: 'ss', series: buildScale(DATA.scaling.success, KS), hiddenMap: state.scalingHidden, xDomain: [1, 1000], yDomain: [0.004, 0.058], xLog: true, yLog: false, xTicks: [1, 10, 100, 1000], yTicks: [0.01, 0.02, 0.03, 0.04, 0.05], xLabel: 'Action samples (k)', yLabel: 'Oracle action error', xfmt: XF, yfmt: function (v) { return v.toFixed(2); }, tipfmt: function (v) { return v.toFixed(3); }, tipTitle: function (v) { return 'k ≈ ' + Math.round(v); } };
+    if (idx === 0) return { id: 'sf', series: buildScale(DATA.scaling.failure, KS), hiddenMap: state.scalingHidden, xDomain: [1, 1000], yDomain: [0.18, 0.42], xLog: true, yLog: false, xTicks: [1, 10, 100, 1000], yTicks: [0.20, 0.25, 0.30, 0.35, 0.40], xLabel: 'Action samples (k)', yLabel: 'Oracle action error (e)', xfmt: XF, yfmt: function (v) { return v.toFixed(2); }, tipfmt: function (v) { return v.toFixed(3); }, tipTitle: function (v) { return 'k ≈ ' + Math.round(v); } };
+    return { id: 'ss', series: buildScale(DATA.scaling.success, KS), hiddenMap: state.scalingHidden, xDomain: [1, 1000], yDomain: [0.004, 0.058], xLog: true, yLog: false, xTicks: [1, 10, 100, 1000], yTicks: [0.01, 0.02, 0.03, 0.04, 0.05], xLabel: 'Action samples (k)', yLabel: 'Oracle action error (e)', xfmt: XF, yfmt: function (v) { return v.toFixed(2); }, tipfmt: function (v) { return v.toFixed(3); }, tipTitle: function (v) { return 'k ≈ ' + Math.round(v); } };
   }
 
   /* ---------- renderers ---------- */
@@ -313,8 +313,8 @@
     var gh = ph / ng;
     cfg.groups.forEach(function (grp, gi) {
       var gy0 = m.t + gi * gh, gpad = gh * 0.11, bgap = 4, bh = (gh - 2 * gpad - (ns - 1) * bgap) / ns, gyc = gy0 + gh / 2;
-      var lines = wrap(grp.name, 16);
-      lines.forEach(function (ln, li) { els.push(S('text', { x: m.l - 12, y: gyc - (lines.length - 1) * 9 + li * 18 + 4, textAnchor: 'end', fontSize: 12.5, fontFamily: "'DM Sans'", fontWeight: 600, fill: '#111111' }, [ln])); });
+      var lines = grp.name.indexOf('\n') !== -1 ? grp.name.split('\n') : wrap(grp.name, 16);
+      lines.forEach(function (ln, li) { els.push(S('text', { x: m.l - 50, y: gyc - (lines.length - 1) * 9 + li * 18 + 4, textAnchor: 'middle', fontSize: 14.5, fontFamily: "'DM Sans'", fontWeight: 600, fill: '#111111' }, [ln])); });
       grp.vals.forEach(function (v, si) {
         var sn = cfg.series[si]; if (state.samplesHidden[sn]) return;
         var by = gy0 + gpad + si * (bh + bgap), col = cfg.colors[si], sd = grp.std[si], yc = by + bh / 2;
@@ -377,8 +377,10 @@
     fc.appendChild(h('div', { style: { display: 'flex', alignItems: 'center', gap: '14px', fontFamily: "'Chakra Petch'", fontSize: '10.5px', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase', color: '#525252' } }));
 
     var INSIGHT = {
-      ood_prompt: 'On out-of-domain prompts, adaptive steering pre-empts failure and <strong style="color:#111111;font-style:normal">replans on the fly</strong> &mdash; recovering task success where the frozen VLA stalls.',
-      ood_env: 'In out-of-domain environments, adaptive steering <strong style="color:#111111;font-style:normal">diversifies actions to reject distractors and unfamiliar objects</strong> (e.g. lifting the tape clear of clutter) &mdash; where the base VLA gets stuck.'
+      ood_prompt: 'On OOD prompts, adaptive steering more likely achieves successful <strong style="color:#111111;font-style:normal">replanning</strong>.',
+      ood_env: 'In OOD environments, adaptive steering performs better with unseen task objects and is <strong style="color:#111111;font-style:normal">robust towards distractors</strong>.'
+      // ood_prompt: 'On OOD prompts, adaptive steering pre-empts failure and <strong style="color:#111111;font-style:normal">replans on the fly</strong> &mdash; recovering task success where the frozen VLA stalls.',
+      // ood_env: 'In OOD environments, adaptive steering <strong style="color:#111111;font-style:normal">diversifies actions to reject distractors and unfamiliar objects</strong> (e.g. lifting the tape clear of clutter) &mdash; where the base VLA gets stuck.'
     };
     var ins = $('gallery-insight'); clear(ins);
     ins.appendChild(h('div', { style: { margin: '26px 0 4px' } }, [
