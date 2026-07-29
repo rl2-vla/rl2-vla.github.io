@@ -345,26 +345,41 @@
     // fill; shorter ones by how much of themselves is showing
     return Math.max(vis / vh, vis / Math.max(1, r.height));
   }
-  function onScreen(el, frac) { return !!el && !document.hidden && viewportShare(el) > (frac == null ? 0.3 : frac); }
+  // pure geometry — a hidden tab is *not* "scrolled away", so callers gate playback on
+  // document.hidden separately and a tab switch resumes in place instead of restarting
+  function onScreen(el, frac) { return !!el && viewportShare(el) > (frac == null ? 0.3 : frac); }
 
   var galleryVids = [], galleryIO = null, galleryTimer = null;
   var GALLERY_HOLD_MS = 3000, GALLERY_STALL_MS = 8000;
   // used only while no clip has reported a duration yet, and as a backstop for a tab
   // whose metadata never resolves (e.g. iOS refusing to preload on cellular)
   var GALLERY_FALLBACK_MS = 15000, GALLERY_CEIL_MS = 60000;
-  var galleryElapsed = 0, galleryLast = 0, galleryStall = 0;
+  var galleryElapsed = 0, galleryLast = 0, galleryStall = 0, galleryLive = false;
   function galleryInView() { return onScreen($('gallery'), 0.25); }
+  function galleryRewind(v) { if (v) { try { if (v.currentTime > 0) v.currentTime = 0; } catch (e) {} } }
   // Two gates have to agree before a tile plays: the gallery section must own the
   // screen *and* the tile itself must be visible inside it. The IntersectionObserver
   // only fires on tile changes, so scrolling between sections re-checks here.
   function syncGalleryPlayback() {
-    var live = galleryInView();
+    var here = galleryInView(), live = here && !document.hidden;
+    // Scrolling to the section restarts the whole tab from frame one, like the demo
+    // player does — and the turn clock restarts with it, so a tab that was half-watched
+    // before doesn't flip part-way through the replay. Keyed on scroll position, not on
+    // `live`, so hiding/showing the browser tab pauses and resumes without a reset.
+    if (here && !galleryLive) { galleryVids.forEach(galleryRewind); scheduleGalleryAuto(); }
+    galleryLive = here;
     galleryVids.forEach(function (v) {
       if (!v) return;
-      // never play() an ended clip — that rewinds it to 0, so a finished tile would
-      // restart itself on every scroll tick instead of holding its last frame
-      if (live && v.tileVisible) { if (v.paused && !v.ended) v.play().catch(function () {}); }
-      else if (!v.paused) v.pause();
+      var on = live && !!v.tileVisible, was = !!v.wasLive;
+      v.wasLive = on;
+      if (!on) { if (!v.paused) v.pause(); return; }
+      // Only the *transition* into view replays a clip: a tile scrolled back to starts
+      // over instead of resuming or sitting on its frozen last frame. The 0.5s floor
+      // stops a tile hovering at the visibility threshold from restarting repeatedly.
+      if (!was && (v.ended || v.currentTime > 0.5)) galleryRewind(v);
+      // finished while on screen — hold the last frame, don't roll it again
+      else if (v.ended) return;
+      if (v.paused) v.play().catch(function () {});
     });
   }
   function galleryPlaying() {
