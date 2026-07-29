@@ -333,21 +333,59 @@
     els.push(S('line', { x1: m.l, x2: m.l + pw, y1: m.t + ph, y2: m.t + ph, stroke: '#111111', strokeWidth: 1.5 }));
     return h('div', { style: { width: '100%' } }, [S('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', style: { display: 'block', overflow: 'visible' } }, els)]);
   }
+  /* ---------- viewport gating for the video sections ----------
+     Clips only roll while the block holding them owns a real share of the screen:
+     scrolling into a section starts its videos, scrolling on to the next one
+     pauses them (and stops burning decoders on off-screen rollouts). */
+  function viewportShare(el) {
+    var r = el.getBoundingClientRect(), vh = window.innerHeight || 800;
+    var vis = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+    if (vis <= 0) return 0;
+    // blocks taller than the screen are judged by how much of the screen they
+    // fill; shorter ones by how much of themselves is showing
+    return Math.max(vis / vh, vis / Math.max(1, r.height));
+  }
+  function onScreen(el, frac) { return !!el && !document.hidden && viewportShare(el) > (frac == null ? 0.3 : frac); }
+
   var galleryVids = [], galleryIO = null, galleryTimer = null;
-  var GALLERY_HOLD_MS = 3000, GALLERY_MIN_MS = 9000, GALLERY_MAX_MS = 26000, GALLERY_STALL_MS = 8000;
+  var GALLERY_HOLD_MS = 3000, GALLERY_STALL_MS = 8000;
+  // used only while no clip has reported a duration yet, and as a backstop for a tab
+  // whose metadata never resolves (e.g. iOS refusing to preload on cellular)
+  var GALLERY_FALLBACK_MS = 15000, GALLERY_CEIL_MS = 60000;
   var galleryElapsed = 0, galleryLast = 0, galleryStall = 0;
-  function galleryInView() { var g = $('gallery'); if (!g) return false; var r = g.getBoundingClientRect(), vh = window.innerHeight || 800; return r.bottom > vh * 0.15 && r.top < vh * 0.85; }
+  function galleryInView() { return onScreen($('gallery'), 0.25); }
+  // Two gates have to agree before a tile plays: the gallery section must own the
+  // screen *and* the tile itself must be visible inside it. The IntersectionObserver
+  // only fires on tile changes, so scrolling between sections re-checks here.
+  function syncGalleryPlayback() {
+    var live = galleryInView();
+    galleryVids.forEach(function (v) {
+      if (!v) return;
+      // never play() an ended clip — that rewinds it to 0, so a finished tile would
+      // restart itself on every scroll tick instead of holding its last frame
+      if (live && v.tileVisible) { if (v.paused && !v.ended) v.play().catch(function () {}); }
+      else if (!v.paused) v.pause();
+    });
+  }
   function galleryPlaying() {
     for (var i = 0; i < galleryVids.length; i++) { var v = galleryVids[i]; if (v && !v.paused && !v.ended && v.currentTime > 0) return true; }
     return false;
   }
-  // A tab's turn lasts one full pass of its longest clip plus GALLERY_HOLD_MS, so the
-  // rollouts always play out to the end (and linger a beat) before the rotation moves on.
-  // Durations arrive as tiles lazy-load, so this only ever grows during a turn.
+  // true once any clip has played through: proof the tab is rolling, so clips that have
+  // finished (or are frozen on their last frame) don't read as a load stall
+  function galleryStarted() {
+    for (var i = 0; i < galleryVids.length; i++) { var v = galleryVids[i]; if (v && v.ended) return true; }
+    return false;
+  }
+  // A tab's turn is exactly one full pass of its *longest* clip plus GALLERY_HOLD_MS, so
+  // every rollout in the tab plays out to the end (and lingers a beat) before the rotation
+  // moves on. Tiles preload metadata, so all durations are known within the first moment of
+  // the turn; the value can only grow if a straggler reports a longer clip.
   function galleryTurnMs() {
     var d = 0;
     for (var i = 0; i < galleryVids.length; i++) { var v = galleryVids[i]; if (v && v.duration && isFinite(v.duration)) d = Math.max(d, v.duration * 1000); }
-    return Math.max(GALLERY_MIN_MS, Math.min(GALLERY_MAX_MS, d + GALLERY_HOLD_MS));
+    if (!d) return GALLERY_FALLBACK_MS + GALLERY_HOLD_MS;
+    return Math.min(GALLERY_CEIL_MS, d + GALLERY_HOLD_MS);
   }
   // The turn is measured in *watch* time, not wall-clock time: the clock only
   // advances while the gallery is on screen and its clips are actually rolling.
@@ -360,7 +398,7 @@
       var now = performance.now(), dt = now - galleryLast;
       galleryLast = now;
       if (document.hidden || !galleryInView()) { galleryStall = 0; return; }
-      if (!galleryPlaying()) {
+      if (!galleryPlaying() && !galleryStarted()) {
         // safety net: never wedge the rotation on a clip that fails to load
         galleryStall += dt;
         if (galleryStall < GALLERY_STALL_MS) return;
@@ -423,15 +461,14 @@
 
     galleryIO = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        var v = e.target;
-        // lazily attach the source as the tile nears the viewport, but only start
-        // playback once the tile is actually visible on screen
-        if (e.isIntersecting && !v.src) { v.src = v.getAttribute('data-src'); }
-        if (e.isIntersecting && e.intersectionRatio >= 0.25) { v.play().catch(function () {}); }
-        else { v.pause(); }
+        // record visibility only; syncGalleryPlayback owns play/pause so the section
+        // gate and the tile gate are always applied together
+        e.target.tileVisible = e.isIntersecting && e.intersectionRatio >= 0.25;
       });
+      syncGalleryPlayback();
     }, { rootMargin: '0px', threshold: [0, 0.25] });
     galleryVids.forEach(function (v) { galleryIO.observe(v); });
+    syncGalleryPlayback();
     scheduleGalleryAuto();
   }
   function galStatRow(fromName, fromVal, fromColor, toName, toVal, toColor) {
@@ -449,9 +486,14 @@
   }
   function galTile(src, tag, opts) {
     opts = opts || {};
-    var v = h('video', { preload: 'none', 'data-src': GVID + encodeURI(src) });
-    v.muted = true; v.loop = true; v.playsInline = true;
-    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('loop', '');
+    // metadata (not media data) up front: the auto-rotation sizes a tab's turn from the
+    // longest clip in it, so every duration has to be known before the clock starts —
+    // headers are cheap next to the 10-25 MB rollouts, which only download on play()
+    var v = h('video', { preload: 'metadata', src: GVID + encodeURI(src) });
+    // no loop: each rollout plays through once and holds on its last frame until the
+    // tab's turn (sized by the longest clip) is up
+    v.muted = true; v.loop = false; v.playsInline = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
     galleryVids.push(v);
     return h('div', { 'class': 'gal-tile' + (opts.plot ? ' plot' : '') + (opts.ours ? ' ours' : '') }, [
       v, h('div', { 'class': 'gal-tag' }, [tag])
@@ -499,7 +541,7 @@
   // beat to linger on the finished rollout before the carousel steps to the next example
   var DEMO_END_HOLD_MS = 3000;
   function fmt(s) { s = Math.max(0, s || 0); var m = Math.floor(s / 60), sec = Math.floor(s % 60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
-  function demoFigInView() { var fig = demo.fig || (demo.fig = document.querySelector('[data-demo-fig]')); if (!fig) return true; var rr = fig.getBoundingClientRect(), vh = window.innerHeight || 800; return rr.bottom > vh * 0.1 && rr.top < vh * 0.9; }
+  function demoFigInView() { var fig = demo.fig || (demo.fig = document.querySelector('[data-demo-fig]')); if (!fig) return true; return onScreen(fig, 0.3); }
   function demoLoaders(show) { demo.loaders.forEach(function (l) { if (l) l.style.display = show ? 'flex' : 'none'; }); }
   function topDur() { var d = 0; demo.tops.forEach(function (v) { if (v && v.duration && isFinite(v.duration)) d = Math.max(d, v.duration); }); return d || demo.baseDur; }
   function baseT() { var t = 0; demo.tops.forEach(function (v) { if (v) t = Math.max(t, v.currentTime || 0); }); return t; }
@@ -525,11 +567,27 @@
   function demoSeek(t) { demo.endHold = 0; try { if (demo.cam) demo.cam.currentTime = t; if (demo.plot) demo.plot.currentTime = t; } catch (e) {} demo.triggered = {}; demo.markers.forEach(function (x) { if (x.t <= t + 0.001) demo.triggered[x.n] = true; }); demo.prevT = t; }
   function goBaseline() { try { demo.tops.forEach(function (v) { v.currentTime = 0; }); } catch (e) {} setPhase('baseline'); if (demo.playing && demo.inView) demoPlay(); }
   function goProposed() { demoSeek(0); setPhase('proposed'); if (demo.playing && demo.inView) demoPlay(); }
+  // Scrolling back into the section starts the example over rather than resuming: the
+  // baseline clips and the hero pair both rewind, keypoint state clears, and the run
+  // replays from the baseline phase. A manual pause is respected — it rewinds, but stays
+  // parked on frame one until the play button is hit.
+  function demoRestart() {
+    demo.markerPause = false; demo.pauseUntil = 0;
+    try { demo.tops.forEach(function (v) { if (v) v.currentTime = 0; }); } catch (e) {}
+    demoSeek(0);
+    setPhase('baseline');
+    demo.phaseStart = performance.now();
+    if (demo.playing) demoPlay();
+  }
   function clickMarker(i) { if (!demo.ready) return; var m = demo.markers[i]; if (!m) return; demo.playing = true; if (demo.phase !== 'proposed') setPhase('proposed'); demoSeek(m.t); demoEnterMarker(m); }
   function scrub(e) { if (!demo.ready || !demo.track) return; var r = demo.track.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), t = f * demo.dur; if (demo.phase !== 'proposed') setPhase('proposed'); demoSeek(t); demo.markerPause = false; demoHideOverlay(); if (demo.playing) demoPlay(); demoSyncIcon(); updateStatusUI(); }
   function demoTick() {
     if (demo.cam && demo.plot && demo.ready) {
-      if ((demo.vc = (demo.vc + 1) % 6) === 0) { demo.inView = demoFigInView(); }
+      if ((demo.vc = (demo.vc + 1) % 6) === 0) {
+        var was = demo.inView;
+        demo.inView = demoFigInView();
+        if (demo.inView && !was) demoRestart();
+      }
       var prop = demo.phase === 'proposed';
       var t = prop ? (demo.cam.currentTime || 0) : baseT();
       var dur = prop ? demo.dur : topDur();
@@ -554,6 +612,18 @@
           if (done || (performance.now() - demo.phaseStart) > (topDur() + 1.6) * 1000) goProposed();
         }
       } else if (!demo.inView) { demoPause(); if (demo.endHold) demo.endHold = performance.now() + DEMO_END_HOLD_MS; }
+    } else if (demo.tops.length) {
+      // hero pair still priming: the baseline loops still follow the viewport
+      if ((demo.vc = (demo.vc + 1) % 6) === 0) {
+        var wasP = demo.inView;
+        demo.inView = demoFigInView();
+        if (demo.inView && !wasP) { try { demo.tops.forEach(function (v) { if (v) v.currentTime = 0; }); } catch (e) {} }
+        demo.tops.forEach(function (v) {
+          if (!v) return;
+          if (demo.inView && demo.playing) { if (v.paused) v.play().catch(function () {}); }
+          else if (!v.paused) v.pause();
+        });
+      }
     }
     requestAnimationFrame(demoTick);
   }
@@ -721,6 +791,21 @@
     } catch (e) {}
   }
 
+  /* ---------- keep gallery playback in step with scrolling ----------
+     The demo player already re-checks its own viewport share every few frames in
+     demoTick; the gallery has no such loop, so drive it off scroll/resize. */
+  function initVideoGating() {
+    var queued = false;
+    var sync = function () {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () { queued = false; syncGalleryPlayback(); });
+    };
+    window.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync, { passive: true });
+    document.addEventListener('visibilitychange', function () { syncGalleryPlayback(); });
+  }
+
   /* ---------- scroll-down cue at the bottom of every section ---------- */
   var CUE_SVG = '<svg width="27" height="42" viewBox="0 0 27 42" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
     + '<rect x="2" y="2" width="23" height="38" rx="11.5"></rect>'
@@ -751,6 +836,7 @@
     initBibtex();
     initDemo();
     initObservers();
+    initVideoGating();
     initScrollCues();
     initTooltipGuards();
   }
