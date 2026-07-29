@@ -99,9 +99,9 @@
       plot: { label: 'Failure detection', src: GVID + 'ood_env/real/screwdriver_in_toolbox/CP_ADAPTIVE_COMPOSE_Screwdriver_in_Toolbox_speedx5.mp4' },
       markers: [
         { n: 1, t: 3.6, x: 34.0, y: 37.5, title: 'Base VLA actions', desc: 'RL² relies on base VLA to move towards the screwdriver. Failure scores starts to flag the impending grasp failure.' },
-        { n: 2, t: 5.5, x: 42.0, y: 27.0, title: 'RL² Steering - Grasp', desc: 'Compositional steering diversifies the grasp away from the distractor tape and towards the screwdriver.' },
-        { n: 3, t: 8.5, x: 53.0, y: 36.0, title: 'RL² Steering - Lift', desc: 'RL² steering lifts the screwdriver up and carries it toward the toolbox while remaining undistracted.' },
-        { n: 4, t: 11.3, x: 64.0, y: 68.0, title: 'Task success', desc: 'Screwdriver is placed into the toolbox and failure scores drop back under the CP band. Task succeeds.' }
+        { n: 2, t: 5.5, x: 42.0, y: 29.0, title: 'RL² Steering - Grasp', desc: 'Compositional steering diversifies the grasp away from the distractor tape and towards the screwdriver.' },
+        { n: 3, t: 8.3, x: 53.0, y: 38.0, title: 'RL² Steering - Lift', desc: 'RL² steering lifts the screwdriver up and carries it toward the toolbox while remaining undistracted.' },
+        { n: 4, t: 11.3, x: 64.0, y: 70.0, title: 'Task success', desc: 'Screwdriver is placed into the toolbox and failure scores drop back under the CP band. Task succeeds.' }
       ]
     },
     {
@@ -113,15 +113,15 @@
       cam: { label: 'Adaptive steering', src: GVID + 'ood_prompt/sim/pan_cleaning/ADAPTIVE_COMPOSE_Pan_Cleaning_speedx3.mp4' },
       plot: { label: 'Failure detection', src: GVID + 'ood_prompt/sim/pan_cleaning/CP_ADAPTIVE_COMPOSE_Pan_Cleaning_speedx3.mp4' },
       markers: [
-        { n: 1, t: 3.04, x: 33.0, y: 41.7, title: 'Failed grasp', desc: 'The base VLA fumbles the grasp on the brush — failure scores sₜ begin climbing toward the conformal (CP) band as the approach goes wrong.' },
-        { n: 2, t: 4.43, x: 49.0, y: 32.7, title: 'Failure detected', desc: 'Failure scores cross above the CP band. RL² flags the failing grasp via Conformal Prediction and gates on compositional steering.' },
-        { n: 3, t: 6.82, x: 69.0, y: 29.0, title: 'Steering — successful grasp', desc: 'RL² composes its RL steering velocity with the VLA, diversifying candidate grasps until the brush is securely grasped.' },
-        { n: 4, t: 11.46, x: 91.0, y: 60.5, title: 'Undistracted — brush wipes the pan', desc: 'Failure scores fall back under the band: the corrected, undistracted trajectory brings the brush into contact with the pan. Task succeeds.' }
+        { n: 1, t: 2.80, x: 33.0, y: 43.0, title: 'Base VLA - Failed grasp', desc: 'The base VLA initially fails to grasp the sponge. Failure scores increases upon repeated failures.' },
+        { n: 2, t: 4.60, x: 49.0, y: 27.0, title: 'Failure detected', desc: 'Failure detected when failure scores cross the CP band. RL² starts to apply compositional steering.' },
+        { n: 3, t: 6.80, x: 67.0, y: 22.0, title: 'RL² Steering — successful grasp', desc: 'RL² steers the VLA towards diverse candidate grasps until the sponge is securely grasped.' },
+        { n: 4, t: 11.8, x: 94.0, y: 56.0, title: 'Task Success', desc: 'The sponge brushes against the pan for cleaning and failure scores drop back under the CP band. Task succeeds.' }
       ]
     }
   ];
 
-  var BIBTEX = '@article{tan2026rl2vla,\n  title   = {RL^2-VLA: Adaptive RL Latent Compositional Steering with Test-Time\n             Scaling for Vision-Language-Action Models},\n  author  = {Tan, Derek Ming Siang and Shailesh, Shailesh and Iyer, Srikrishna and\n             Teo, William Wei Jie and Ju, Yuanliang and Gu, Qiao and Sartoretti, Guillaume},\n  year    = {2026},\n  journal = {arXiv preprint}\n}';
+  var BIBTEX = '@article{tan2026rl2vla,\n  title   = {RL^2-VLA: Adaptive RL Latent Compositional Steering with Test-Time Scaling for Vision-Language-Action Models},\n  author  = {Tan, Derek Ming Siang and Shailesh, Shailesh and Iyer, Srikrishna and Teo, William Wei Jie and Ju, Yuanliang and Gu, Qiao and Sartoretti, Guillaume},\n  year    = {2026},\n  journal = {arXiv preprint}\n}';
 
   var TOC = [['overview', 'Overview'], ['abstract', 'Abstract'], ['demo', 'RL² in Action'], ['method', 'Method'], ['results', 'Results'], ['gallery', 'Task Gallery'], ['bibtex', 'BibTeX']];
   var BENCH_TABS = [['polaris_S', 'π₀.₅ · OOD Prompt'], ['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env']];
@@ -325,9 +325,12 @@
           els.push(S('line', { 'class': 'hbar-anno', x1: xr, x2: xr, y1: yc - cap, y2: yc + cap, stroke: '#111111', strokeWidth: 1.2, 'stroke-opacity': 0.62 })); }
         els.push(S('text', { 'class': 'hbar-anno', x: x(Math.min(ymax, v + sd)) + 6, y: yc + 3.5, textAnchor: 'start', fontSize: 9.5, fontFamily: "'Chakra Petch'", fontWeight: 600, fill: '#525252' }, [v.toFixed(1)]));
       });
-      var ax = m.l + pw + 20, ty = gyc - 20, tx = ax + 28;
-      els.push(S('line', { 'class': 'hbar-anno', x1: ax, x2: tx, y1: gyc + 20, y2: ty, stroke: grp.gainColor, strokeWidth: 2.6, strokeLinecap: 'round' }));
-      els.push(S('polygon', { 'class': 'hbar-anno', points: tx + ',' + ty + ' ' + (tx - 11) + ',' + (ty + 3) + ' ' + (tx - 4) + ',' + (ty + 11), fill: grp.gainColor }));
+      var ax = m.l + pw + 20, ty = gyc - 36, tx = ax + 42, ay = gyc + 20;
+      var dx = tx - ax, dy = ty - ay, dlen = Math.sqrt(dx * dx + dy * dy), ux = dx / dlen, uy = dy / dlen, px = -uy, py = ux;
+      var headLen = 12, headW = 5, bx = tx - ux * headLen, by = ty - uy * headLen;
+      var p1x = bx + px * headW, p1y = by + py * headW, p2x = bx - px * headW, p2y = by - py * headW;
+      els.push(S('line', { 'class': 'hbar-anno', x1: ax, x2: tx, y1: ay, y2: ty, stroke: grp.gainColor, strokeWidth: 2.6, strokeLinecap: 'round' }));
+      els.push(S('polygon', { 'class': 'hbar-anno', points: tx + ',' + ty + ' ' + p1x + ',' + p1y + ' ' + p2x + ',' + p2y, fill: grp.gainColor }));
       els.push(S('text', { 'class': 'hbar-anno', x: tx + 8, y: gyc + 5, textAnchor: 'start', fontSize: 14, fontFamily: "'Chakra Petch'", fontWeight: 700, fill: grp.gainColor }, ['+' + grp.gain.toFixed(1) + '%']));
     });
     els.push(S('line', { x1: m.l, x2: m.l + pw, y1: m.t + ph, y2: m.t + ph, stroke: '#111111', strokeWidth: 1.5 }));

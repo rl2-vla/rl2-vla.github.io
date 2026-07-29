@@ -122,6 +122,9 @@ pre{margin:0}
   /* offset anchor jumps so section tops clear both fixed bars */
   html{scroll-padding-top:104px}
 
-  /* 2. overview metrics: scroll horizontally rather than squeezing 6 columns into the viewport */
-  .metrics-grid{grid-template-columns:repeat(6,minmax(130px,1fr))!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch}
+  /* 2. overview metrics: scroll horizontally rather than squeezing 5 columns into the viewport */
+  .metrics-grid{grid-template-columns:repeat(5,minmax(130px,1fr))!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch}
+
+  /* 3. poster figure: shrink the vertical padding on phones (desktop value is too large) */
+  .fig1-box{padding:10px 0!important}
 }
