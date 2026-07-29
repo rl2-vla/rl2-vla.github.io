@@ -87,14 +87,13 @@
     { src: 'assets/images/workflow_4.jpeg', title: 'Action Verification', caption: 'A verifier VLM (RoboMonkey / CoVer) scores the composed action candidates and selects the best action â* to execute on the robot.' }
   ];
 
-  var R = 'assets/images/fig2_real/', SM = 'assets/images/fig2_sim/';
   var DEMO_EXAMPLES = [
     {
       id: 'real', eyebrow: 'Real robot · OOD environment', title: 'Put screwdriver in toolbox', tag: 'OOD Env',
       layout: '2x2', blockAspect: '1440/1080',
       top: [
-        { label: 'Rephrase', src: R + 'tape_toolbox_rephrase.mp4' },
-        { label: 'Compose-Always', src: R + 'compose_always_screwdriver_toolbox.mp4' }
+        { label: 'Rephrase', src: GVID + 'ood_env/real/screwdriver_in_toolbox/REPHRASE_Screwdriver_in_Toolbox_speedx5.mp4' },
+        { label: 'Compose-Always', src: GVID + 'ood_env/real/screwdriver_in_toolbox/COMPOSE_ALWAYS_Screwdriver_in_Toolbox_speedx5.mp4' }
       ],
       cam: { label: 'Adaptive steering', src: GVID + 'ood_env/real/screwdriver_in_toolbox/ADAPTIVE_COMPOSE_Ext_Screwdriver_in_Toolbox_speedx5.mp4' },
       plot: { label: 'Failure detection', src: GVID + 'ood_env/real/screwdriver_in_toolbox/CP_ADAPTIVE_COMPOSE_Screwdriver_in_Toolbox_speedx5.mp4' },
@@ -107,17 +106,17 @@
     },
     {
       id: 'sim', eyebrow: 'Simulation · PolaRiS · OOD prompt', title: 'Pan cleaning', tag: 'OOD Prompt',
-      layout: '1+2', blockAspect: '16/9',
+      layout: '1+2', blockAspect: '1440/1080',
       top: [
-        { label: 'Rephrase', src: SM + 'rephrase_pan_clean_polaris.mp4' }
+        { label: 'Rephrase', src: GVID + 'ood_prompt/sim/pan_cleaning/REPHRASE_Pan_Cleaning_speedx3.mp4' }
       ],
-      cam: { label: 'Adaptive steering', src: SM + 'adaptive_compose_pan_clean.mp4' },
-      plot: { label: 'Failure detection', src: SM + 'adaptive_compose_SAFE_pan_clean.mp4' },
+      cam: { label: 'Adaptive steering', src: GVID + 'ood_prompt/sim/pan_cleaning/ADAPTIVE_COMPOSE_Pan_Cleaning_speedx3.mp4' },
+      plot: { label: 'Failure detection', src: GVID + 'ood_prompt/sim/pan_cleaning/CP_ADAPTIVE_COMPOSE_Pan_Cleaning_speedx3.mp4' },
       markers: [
-        { n: 1, t: 2.59, x: 33.0, y: 39.0, title: 'Base VLA - Failed grasp', desc: 'The base VLA initially fails to grasp the sponge. Failure scores increases upon repeated failures.' },
-        { n: 2, t: 4.07, x: 49.0, y: 27.0, title: 'Failure detected', desc: 'Failure detected when failure scores cross the CP band. RL² starts to apply compositional steering.' },
-        { n: 3, t: 5.93, x: 69.0, y: 22.0, title: 'RL² Steering — successful grasp', desc: 'RL² steers the VLA towards diverse candidate grasps until the sponge is securely grasped.' },
-        { n: 4, t: 8.15, x: 91.0, y: 64.0, title: 'Task Success', desc: 'The sponge brushes against the pan for cleaning and failure scores drop back under the CP band. Task succeeds.' }
+        { n: 1, t: 3.04, x: 33.0, y: 41.7, title: 'Failed grasp', desc: 'The base VLA fumbles the grasp on the brush — failure scores sₜ begin climbing toward the conformal (CP) band as the approach goes wrong.' },
+        { n: 2, t: 4.43, x: 49.0, y: 32.7, title: 'Failure detected', desc: 'Failure scores cross above the CP band. RL² flags the failing grasp via Conformal Prediction and gates on compositional steering.' },
+        { n: 3, t: 6.82, x: 69.0, y: 29.0, title: 'Steering — successful grasp', desc: 'RL² composes its RL steering velocity with the VLA, diversifying candidate grasps until the brush is securely grasped.' },
+        { n: 4, t: 11.46, x: 91.0, y: 60.5, title: 'Undistracted — brush wipes the pan', desc: 'Failure scores fall back under the band: the corrected, undistracted trajectory brings the brush into contact with the pan. Task succeeds.' }
       ]
     }
   ];
@@ -335,20 +334,28 @@
     return h('div', { style: { width: '100%' } }, [S('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', style: { display: 'block', overflow: 'visible' } }, els)]);
   }
   var galleryVids = [], galleryIO = null, galleryTimer = null;
-  var GALLERY_AUTO_MS = 12000, GALLERY_STALL_MS = 8000;
-  var galleryRemain = GALLERY_AUTO_MS, galleryLast = 0, galleryStall = 0;
+  var GALLERY_HOLD_MS = 3000, GALLERY_MIN_MS = 9000, GALLERY_MAX_MS = 26000, GALLERY_STALL_MS = 8000;
+  var galleryElapsed = 0, galleryLast = 0, galleryStall = 0;
   function galleryInView() { var g = $('gallery'); if (!g) return false; var r = g.getBoundingClientRect(), vh = window.innerHeight || 800; return r.bottom > vh * 0.15 && r.top < vh * 0.85; }
   function galleryPlaying() {
     for (var i = 0; i < galleryVids.length; i++) { var v = galleryVids[i]; if (v && !v.paused && !v.ended && v.currentTime > 0) return true; }
     return false;
   }
-  // The tab's turn is measured in *watch* time, not wall-clock time: the clock only
+  // A tab's turn lasts one full pass of its longest clip plus GALLERY_HOLD_MS, so the
+  // rollouts always play out to the end (and linger a beat) before the rotation moves on.
+  // Durations arrive as tiles lazy-load, so this only ever grows during a turn.
+  function galleryTurnMs() {
+    var d = 0;
+    for (var i = 0; i < galleryVids.length; i++) { var v = galleryVids[i]; if (v && v.duration && isFinite(v.duration)) d = Math.max(d, v.duration * 1000); }
+    return Math.max(GALLERY_MIN_MS, Math.min(GALLERY_MAX_MS, d + GALLERY_HOLD_MS));
+  }
+  // The turn is measured in *watch* time, not wall-clock time: the clock only
   // advances while the gallery is on screen and its clips are actually rolling.
   // Otherwise the seconds spent scrolling down the page (or on a hidden tab) burn
   // the turn and the videos get cut off part-way through.
   function scheduleGalleryAuto() {
     clearInterval(galleryTimer);
-    galleryRemain = GALLERY_AUTO_MS; galleryStall = 0; galleryLast = performance.now();
+    galleryElapsed = 0; galleryStall = 0; galleryLast = performance.now();
     galleryTimer = setInterval(function () {
       var now = performance.now(), dt = now - galleryLast;
       galleryLast = now;
@@ -358,8 +365,8 @@
         galleryStall += dt;
         if (galleryStall < GALLERY_STALL_MS) return;
       } else galleryStall = 0;
-      galleryRemain -= dt;
-      if (galleryRemain <= 0) {
+      galleryElapsed += dt;
+      if (galleryElapsed >= galleryTurnMs()) {
         clearInterval(galleryTimer);
         state.galleryTab = (state.galleryTab === 'ood_prompt') ? 'ood_env' : 'ood_prompt';
         renderGallery();
@@ -488,7 +495,9 @@
   var demo = { ex: 0, gen: 0, phase: 'baseline', phaseStart: 0, cam: null, plot: null, ov: null, ovNum: null, ovTitle: null, ovDesc: null,
     loaders: [], mbtns: [], tops: [], markers: [], ticks: [], groupBase: null, groupOurs: null, baseStatus: null, oursStatus: null,
     stage: null, playIcon: null, pauseIcon: null, track: null, fill: null, timeEl: null,
-    playing: true, ready: false, markerPause: false, pauseUntil: 0, triggered: {}, prevT: 0, inView: false, dur: 8.4, baseDur: 9, fig: null, vc: 0, fallback: null };
+    playing: true, ready: false, markerPause: false, pauseUntil: 0, triggered: {}, prevT: 0, inView: false, dur: 8.4, baseDur: 9, fig: null, vc: 0, fallback: null, endHold: 0 };
+  // beat to linger on the finished rollout before the carousel steps to the next example
+  var DEMO_END_HOLD_MS = 3000;
   function fmt(s) { s = Math.max(0, s || 0); var m = Math.floor(s / 60), sec = Math.floor(s % 60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
   function demoFigInView() { var fig = demo.fig || (demo.fig = document.querySelector('[data-demo-fig]')); if (!fig) return true; var rr = fig.getBoundingClientRect(), vh = window.innerHeight || 800; return rr.bottom > vh * 0.1 && rr.top < vh * 0.9; }
   function demoLoaders(show) { demo.loaders.forEach(function (l) { if (l) l.style.display = show ? 'flex' : 'none'; }); }
@@ -498,7 +507,7 @@
   function idleVids() { return demo.phase === 'baseline' ? [demo.cam, demo.plot] : demo.tops; }
   function demoPlay() { phaseVids().forEach(function (v) { if (v) v.play().catch(function () {}); }); idleVids().forEach(function (v) { if (v) v.pause(); }); }
   function demoPause() { [demo.cam, demo.plot].concat(demo.tops).forEach(function (v) { if (v) v.pause(); }); }
-  function demoSyncIcon() { var p = demo.playing && !demo.markerPause; if (demo.playIcon) demo.playIcon.style.display = p ? 'none' : 'block'; if (demo.pauseIcon) demo.pauseIcon.style.display = p ? 'block' : 'none'; }
+  function demoSyncIcon() { var p = demo.playing && !demo.markerPause && !demo.endHold; if (demo.playIcon) demo.playIcon.style.display = p ? 'none' : 'block'; if (demo.pauseIcon) demo.pauseIcon.style.display = p ? 'block' : 'none'; }
   function updateStatusUI() {}
   function toggleTicks(show) { demo.ticks.forEach(function (t) { if (t) t.style.display = show ? 'block' : 'none'; }); }
   function setPhase(p) {
@@ -512,8 +521,8 @@
   function demoShowOverlay(m) { if (demo.ovNum) demo.ovNum.textContent = m.n; if (demo.ovTitle) demo.ovTitle.textContent = m.title; if (demo.ovDesc) demo.ovDesc.textContent = m.desc; if (demo.ov) { demo.ov.style.opacity = '1'; demo.ov.style.transform = 'translateY(0)'; } demoSetActive(m.n); }
   function demoHideOverlay() { if (demo.ov) { demo.ov.style.opacity = '0'; demo.ov.style.transform = 'translateY(10px)'; } demoSetActive(0); }
   function demoEnterMarker(m) { demo.markerPause = true; demo.pauseUntil = performance.now() + 3200; demoPause(); demo.triggered[m.n] = true; demoShowOverlay(m); demoSyncIcon(); updateStatusUI(); }
-  function togglePlay() { if (!demo.ready) return; if (demo.playing && !demo.markerPause) { demo.playing = false; demoPause(); } else { demo.playing = true; demo.markerPause = false; demoHideOverlay(); demoPlay(); } demoSyncIcon(); updateStatusUI(); }
-  function demoSeek(t) { try { if (demo.cam) demo.cam.currentTime = t; if (demo.plot) demo.plot.currentTime = t; } catch (e) {} demo.triggered = {}; demo.markers.forEach(function (x) { if (x.t <= t + 0.001) demo.triggered[x.n] = true; }); demo.prevT = t; }
+  function togglePlay() { if (!demo.ready) return; if (demo.playing && !demo.markerPause && !demo.endHold) { demo.playing = false; demoPause(); } else { demo.playing = true; demo.markerPause = false; if (demo.endHold) { demo.endHold = 0; demoSeek(0); } demoHideOverlay(); demoPlay(); } demoSyncIcon(); updateStatusUI(); }
+  function demoSeek(t) { demo.endHold = 0; try { if (demo.cam) demo.cam.currentTime = t; if (demo.plot) demo.plot.currentTime = t; } catch (e) {} demo.triggered = {}; demo.markers.forEach(function (x) { if (x.t <= t + 0.001) demo.triggered[x.n] = true; }); demo.prevT = t; }
   function goBaseline() { try { demo.tops.forEach(function (v) { v.currentTime = 0; }); } catch (e) {} setPhase('baseline'); if (demo.playing && demo.inView) demoPlay(); }
   function goProposed() { demoSeek(0); setPhase('proposed'); if (demo.playing && demo.inView) demoPlay(); }
   function clickMarker(i) { if (!demo.ready) return; var m = demo.markers[i]; if (!m) return; demo.playing = true; if (demo.phase !== 'proposed') setPhase('proposed'); demoSeek(m.t); demoEnterMarker(m); }
@@ -530,17 +539,21 @@
       if (demo.markerPause) { if (performance.now() >= demo.pauseUntil) { demo.markerPause = false; demoHideOverlay(); if (demo.playing && demo.inView) demoPlay(); demoSyncIcon(); updateStatusUI(); } }
       else if (demo.playing && demo.inView) {
         if (prop) {
-          if (demo.plot.readyState >= 1 && !demo.plot.seeking && Math.abs(demo.plot.currentTime - t) > 0.12) { try { demo.plot.currentTime = t; } catch (e) {} }
-          if (demo.cam.paused && !demo.cam.seeking) demoPlay();
-          for (var i = 0; i < demo.markers.length; i++) { var m = demo.markers[i]; if (!demo.triggered[m.n] && demo.prevT < m.t && t >= m.t) { demoEnterMarker(m); break; } }
-          if (t >= demo.dur) stepDemo(1);
-          else demo.prevT = t;
+          // rollout finished: freeze on the last frame for a beat before the next example
+          if (demo.endHold) { if (performance.now() >= demo.endHold) { demo.endHold = 0; stepDemo(1); } }
+          else if (t >= demo.dur) { demo.endHold = performance.now() + DEMO_END_HOLD_MS; demoPause(); demoSyncIcon(); }
+          else {
+            if (demo.plot.readyState >= 1 && !demo.plot.seeking && Math.abs(demo.plot.currentTime - t) > 0.12) { try { demo.plot.currentTime = t; } catch (e) {} }
+            if (demo.cam.paused && !demo.cam.seeking) demoPlay();
+            for (var i = 0; i < demo.markers.length; i++) { var m = demo.markers[i]; if (!demo.triggered[m.n] && demo.prevT < m.t && t >= m.t) { demoEnterMarker(m); break; } }
+            demo.prevT = t;
+          }
         } else {
           demo.tops.forEach(function (v) { if (v && v.paused && !v.ended && !v.seeking) v.play().catch(function () {}); });
           var done = demo.tops.length && demo.tops.every(function (v) { return v.ended || (v.duration && isFinite(v.duration) && v.currentTime >= v.duration - 0.2); });
           if (done || (performance.now() - demo.phaseStart) > (topDur() + 1.6) * 1000) goProposed();
         }
-      } else if (!demo.inView) { demoPause(); }
+      } else if (!demo.inView) { demoPause(); if (demo.endHold) demo.endHold = performance.now() + DEMO_END_HOLD_MS; }
     }
     requestAnimationFrame(demoTick);
   }
@@ -588,7 +601,7 @@
   function renderDemo() {
     var cfg = DEMO_EXAMPLES[demo.ex];
     demo.gen++; var gen = demo.gen;
-    demo.ready = false; demo.markerPause = false; demo.playing = true; demo.triggered = {}; demo.prevT = 0; demo.phase = 'baseline';
+    demo.ready = false; demo.markerPause = false; demo.endHold = 0; demo.playing = true; demo.triggered = {}; demo.prevT = 0; demo.phase = 'baseline';
     demo.tops = []; demo.mbtns = []; demo.loaders = []; demo.ticks = []; demo.markers = cfg.markers;
 
     $('demo-ex-eyebrow').textContent = cfg.eyebrow;
