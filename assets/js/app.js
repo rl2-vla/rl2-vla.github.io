@@ -555,7 +555,7 @@
   var demo = { ex: 0, gen: 0, phase: 'baseline', phaseStart: 0, cam: null, plot: null, ov: null, ovNum: null, ovTitle: null, ovDesc: null,
     loaders: [], mbtns: [], tops: [], markers: [], ticks: [], groupBase: null, groupOurs: null, baseStatus: null, oursStatus: null,
     stage: null, playIcon: null, pauseIcon: null, track: null, fill: null, timeEl: null,
-    playing: true, ready: false, markerPause: false, pauseUntil: 0, triggered: {}, prevT: 0, inView: false, dur: 8.4, baseDur: 9, fig: null, vc: 0, fallback: null, endHold: 0 };
+    playing: true, ready: false, markerPause: false, pauseUntil: 0, triggered: {}, prevT: 0, inView: false, dur: 8.4, baseDur: 9, fig: null, vc: 0, fallback: null, endHold: 0, lastFrame: 0 };
   // beat to linger on the finished rollout before the carousel steps to the next example
   var DEMO_END_HOLD_MS = 3000;
   function fmt(s) { s = Math.max(0, s || 0); var m = Math.floor(s / 60), sec = Math.floor(s % 60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
@@ -600,6 +600,13 @@
   function clickMarker(i) { if (!demo.ready) return; var m = demo.markers[i]; if (!m) return; demo.playing = true; if (demo.phase !== 'proposed') setPhase('proposed'); demoSeek(m.t); demoEnterMarker(m); }
   function scrub(e) { if (!demo.ready || !demo.track) return; var r = demo.track.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), t = f * demo.dur; if (demo.phase !== 'proposed') setPhase('proposed'); demoSeek(t); demo.markerPause = false; demoHideOverlay(); if (demo.playing) demoPlay(); demoSyncIcon(); updateStatusUI(); }
   function demoTick() {
+    // The baseline hand-off falls back to a wall-clock budget when the loops never report
+    // `ended`. Hold that budget while playback isn't actually running, otherwise a manual
+    // pause burns through it and the run snaps to the steering phase the moment it resumes.
+    var fnow = performance.now();
+    var fdt = Math.min(250, Math.max(0, fnow - (demo.lastFrame || fnow)));
+    demo.lastFrame = fnow;
+    if (!(demo.playing && demo.inView && !demo.markerPause)) demo.phaseStart += fdt;
     if (demo.cam && demo.plot && demo.ready) {
       if ((demo.vc = (demo.vc + 1) % 6) === 0) {
         var was = demo.inView;
