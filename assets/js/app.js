@@ -581,8 +581,25 @@
   function demoShowOverlay(m) { if (demo.ovNum) demo.ovNum.textContent = m.n; if (demo.ovTitle) demo.ovTitle.textContent = m.title; if (demo.ovDesc) demo.ovDesc.textContent = m.desc; if (demo.ov) { demo.ov.style.opacity = '1'; demo.ov.style.transform = 'translateY(0)'; } demoSetActive(m.n); }
   function demoHideOverlay() { if (demo.ov) { demo.ov.style.opacity = '0'; demo.ov.style.transform = 'translateY(10px)'; } demoSetActive(0); }
   function demoEnterMarker(m) { demo.markerPause = true; demo.pauseUntil = performance.now() + 3200; demoPause(); demo.triggered[m.n] = true; demoShowOverlay(m); demoSyncIcon(); updateStatusUI(); }
-  function togglePlay() { if (!demo.ready) return; if (demo.playing && !demo.markerPause && !demo.endHold) { demo.playing = false; demoPause(); } else { demo.playing = true; demo.markerPause = false; if (demo.endHold) { demo.endHold = 0; demoSeek(0); } demoHideOverlay(); demoPlay(); } demoSyncIcon(); updateStatusUI(); }
+  // The baseline loops roll while the hero pair is still priming, so the button has to work
+  // before `ready` too — otherwise the click is swallowed, `demo.playing` stays true, and the
+  // run resumes on its own the moment priming finishes.
+  function togglePlay() { if (!demo.tops.length && !demo.cam) return; if (demo.playing && !demo.markerPause && !demo.endHold) { demo.playing = false; demoPause(); } else { demo.playing = true; demo.markerPause = false; if (demo.endHold) { demo.endHold = 0; demoSeek(0); } demoHideOverlay(); demoPlay(); } demoSyncIcon(); updateStatusUI(); }
   function demoSeek(t) { demo.endHold = 0; try { if (demo.cam) demo.cam.currentTime = t; if (demo.plot) demo.plot.currentTime = t; } catch (e) {} demo.triggered = {}; demo.markers.forEach(function (x) { if (x.t <= t + 0.001) demo.triggered[x.n] = true; }); demo.prevT = t; }
+  // Baseline-phase counterpart: the timeline reads baseline time while that group owns
+  // the stage, so a scrub there has to move the baseline loops — not hand the run over to
+  // the hero pair. Shorter clips park on their last frame so the hand-off check still sees
+  // them as finished, and the wall-clock budget is re-anchored to the new position so it
+  // doesn't fire the instant playback resumes.
+  function demoSeekBaseline(t) {
+    demo.endHold = 0;
+    demo.tops.forEach(function (v) {
+      if (!v) return;
+      var d = (v.duration && isFinite(v.duration)) ? Math.max(0, v.duration - 0.05) : null;
+      try { v.currentTime = d == null ? t : Math.min(t, d); } catch (e) {}
+    });
+    demo.phaseStart = performance.now() - t * 1000;
+  }
   function goBaseline() { try { demo.tops.forEach(function (v) { v.currentTime = 0; }); } catch (e) {} setPhase('baseline'); if (demo.playing && demo.inView) demoPlay(); }
   function goProposed() { demoSeek(0); setPhase('proposed'); if (demo.playing && demo.inView) demoPlay(); }
   // Scrolling back into the section starts the example over rather than resuming: the
@@ -598,7 +615,17 @@
     if (demo.playing) demoPlay();
   }
   function clickMarker(i) { if (!demo.ready) return; var m = demo.markers[i]; if (!m) return; demo.playing = true; if (demo.phase !== 'proposed') setPhase('proposed'); demoSeek(m.t); demoEnterMarker(m); }
-  function scrub(e) { if (!demo.ready || !demo.track) return; var r = demo.track.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), t = f * demo.dur; if (demo.phase !== 'proposed') setPhase('proposed'); demoSeek(t); demo.markerPause = false; demoHideOverlay(); if (demo.playing) demoPlay(); demoSyncIcon(); updateStatusUI(); }
+  // Scrubs the phase that currently owns the stage, and only resumes if the run wasn't
+  // manually paused — dragging the head during the baselines used to jump to the RL² pair.
+  function scrub(e) {
+    if (!demo.track || (!demo.ready && !demo.tops.length)) return;
+    var r = demo.track.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    if (demo.phase === 'proposed') demoSeek(f * demo.dur);
+    else demoSeekBaseline(f * topDur());
+    demo.markerPause = false; demoHideOverlay();
+    if (demo.playing) demoPlay();
+    demoSyncIcon(); updateStatusUI();
+  }
   function demoTick() {
     // The baseline hand-off falls back to a wall-clock budget when the loops never report
     // `ended`. Hold that budget while playback isn't actually running, otherwise a manual
@@ -759,7 +786,7 @@
     // start baseline videos only when in view; prime hero pair, then add timeline ticks
     if (demo.inView) demo.tops.forEach(function (v) { v.play().catch(function () {}); });
     demo.baseDur = 9;
-    demo.fallback = setTimeout(function () { if (gen === demo.gen && !demo.ready) { demo.dur = Math.max(6, (demo.cam.duration || 8.4)); demo.ready = true; demoLoaders(false); setPhase('baseline'); if (demo.inView) demoPlay(); } }, 18000);
+    demo.fallback = setTimeout(function () { if (gen === demo.gen && !demo.ready) { demo.dur = Math.max(6, (demo.cam.duration || 8.4)); demo.ready = true; demoLoaders(false); setPhase('baseline'); if (demo.inView && demo.playing) demoPlay(); } }, 18000);
     Promise.all([prime(demo.cam), prime(demo.plot)]).then(function () {
       if (gen !== demo.gen) return;
       clearTimeout(demo.fallback);
@@ -770,7 +797,8 @@
         var tick = h('span', { class: 'demo-tick', style: { position: 'absolute', top: '50%', left: Math.min(99, (m.t / demo.dur) * 100) + '%', transform: 'translate(-50%,-50%)', width: '7px', height: '7px', borderRadius: '50%', background: '#F9F9F7', border: '1.5px solid #111111', display: 'none' } });
         demo.track.appendChild(tick); demo.ticks.push(tick);
       });
-      demo.ready = true; demoLoaders(false); setPhase('baseline'); demo.phaseStart = performance.now(); demo.inView = demoFigInView(); if (demo.inView) demoPlay(); });
+      // priming finished — pick the run back up only if it wasn't paused while it loaded
+      demo.ready = true; demoLoaders(false); setPhase('baseline'); demo.phaseStart = performance.now(); demo.inView = demoFigInView(); if (demo.inView && demo.playing) demoPlay(); });
   }
   function stepDemo(d) { demo.ex = (demo.ex + d + DEMO_EXAMPLES.length) % DEMO_EXAMPLES.length; renderDemo(); }
   function renderDemoTabs() {
