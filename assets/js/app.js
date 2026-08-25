@@ -818,6 +818,101 @@
     requestAnimationFrame(demoTick);
   }
 
+  /* ---------- action samples visualization (video / static tabs) ---------- */
+  var SAMPLES_VIZ_DIR = 'assets/Processed_Individual_vids/sim_dino_on_towel_OOD_ENV/action_chunk_viz/';
+  var SAMPLES_VIZ_STATIC_HOLD_MS = 10000;
+  var SAMPLES_VIZ_FADE_MS = 320;
+  var samplesViz = { tab: 'video', cam: null, plot: null, track: null, fill: null, timeEl: null, playBtn: null, playIcon: null, pauseIcon: null, playing: false, ready: false, raf: null, timer: null, fadeTimer: null };
+  function svClearTimer() { if (samplesViz.timer) { clearTimeout(samplesViz.timer); samplesViz.timer = null; } }
+  function svGoTab(tab, skipFade) {
+    svClearTimer();
+    if (skipFade) { samplesViz.tab = tab; renderSamplesViz(); return; }
+    clearTimeout(samplesViz.fadeTimer);
+    var stage = $('samples-viz-stage');
+    if (stage) stage.style.opacity = '0';
+    samplesViz.fadeTimer = setTimeout(function () { samplesViz.tab = tab; renderSamplesViz(); }, SAMPLES_VIZ_FADE_MS);
+  }
+  function svFmt(s) { s = Math.max(0, s || 0); var m = Math.floor(s / 60), sec = Math.floor(s % 60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
+  function svDur() { var d = 0; [samplesViz.cam, samplesViz.plot].forEach(function (v) { if (v && v.duration && isFinite(v.duration)) d = Math.max(d, v.duration); }); return d || 0; }
+  function svSyncIcon() { if (samplesViz.playIcon) samplesViz.playIcon.style.display = samplesViz.playing ? 'none' : 'block'; if (samplesViz.pauseIcon) samplesViz.pauseIcon.style.display = samplesViz.playing ? 'block' : 'none'; }
+  function svPlay() { [samplesViz.cam, samplesViz.plot].forEach(function (v) { if (v) v.play().catch(function () {}); }); samplesViz.playing = true; svSyncIcon(); }
+  function svPause() { [samplesViz.cam, samplesViz.plot].forEach(function (v) { if (v) v.pause(); }); samplesViz.playing = false; svSyncIcon(); }
+  function svToggle() { if (!samplesViz.cam) return; if (samplesViz.playing) svPause(); else { if (samplesViz.cam.ended) svSeek(0); svPlay(); } }
+  function svSeek(t) { try { if (samplesViz.cam) samplesViz.cam.currentTime = t; if (samplesViz.plot) samplesViz.plot.currentTime = t; } catch (e) {} }
+  function svScrub(e) {
+    if (!samplesViz.track) return;
+    var r = samplesViz.track.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    svSeek(f * svDur());
+  }
+  function svTick() {
+    samplesViz.raf = requestAnimationFrame(svTick);
+    if (samplesViz.tab !== 'video' || !samplesViz.cam) return;
+    var t = samplesViz.cam.currentTime || 0, dur = svDur();
+    if (samplesViz.fill) samplesViz.fill.style.width = (dur ? Math.min(100, (t / dur) * 100) : 0) + '%';
+    if (samplesViz.timeEl) samplesViz.timeEl.textContent = svFmt(t) + ' / ' + svFmt(dur);
+    if (samplesViz.playing && (samplesViz.cam.ended || (dur && t >= dur - 0.05))) { svPause(); svGoTab('static'); }
+  }
+  function renderSamplesVizVideo(stage) {
+    var camWrap = h('div', { class: 'demo-block is-hero', style: { aspectRatio: '640/480' } }, [
+      (samplesViz.cam = mkVideo(SAMPLES_VIZ_DIR + 'dino_on_towel_adaptive_compose_slow_h264.mp4', 'cam')),
+      h('div', { class: 'demo-tag' }, ['Robot view'])
+    ]);
+    var plotWrap = h('div', { class: 'demo-block is-plot is-hero', style: { aspectRatio: '1440/1080' } }, [
+      (samplesViz.plot = mkVideo(SAMPLES_VIZ_DIR + 'dino_on_towel_adaptive_compose_CP_slow.mp4', 'plot')),
+      h('div', { class: 'demo-tag' }, ['Conformal Prediction'])
+    ]);
+    var grid = h('div', { class: 'demo-grid' }, [camWrap, plotWrap]);
+    stage.appendChild(grid);
+
+    samplesViz.playBtn = h('button', { 'aria-label': 'Play or pause', onClick: svToggle,
+      style: { flex: 'none', cursor: 'pointer', width: '40px', height: '40px', borderRadius: '50%', background: '#111111', border: 'none', color: '#F9F9F7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0' } }, [
+      (samplesViz.playIcon = S('svg', { width: '15', height: '15', viewBox: '0 0 24 24', fill: 'currentColor', style: { display: 'none', marginLeft: '2px' } }, [S('path', { d: 'M8 5v14l11-7z' })])),
+      (samplesViz.pauseIcon = S('svg', { width: '15', height: '15', viewBox: '0 0 24 24', fill: 'currentColor', style: { display: 'block' } }, [S('rect', { x: '6', y: '5', width: '4', height: '14' }), S('rect', { x: '14', y: '5', width: '4', height: '14' })]))
+    ]);
+    samplesViz.fill = h('div', { style: { position: 'absolute', left: '0', top: '0', bottom: '0', width: '0%', borderRadius: '6px', background: '#111111' } });
+    samplesViz.track = h('div', { onClick: svScrub, style: { position: 'relative', flex: '1', height: '8px', borderRadius: '6px', background: '#E2E2DC', cursor: 'pointer' } }, [samplesViz.fill]);
+    samplesViz.timeEl = h('div', { style: { flex: 'none', fontFamily: "'Chakra Petch'", fontSize: '12px', fontWeight: '600', letterSpacing: '0.04em', color: '#525252', minWidth: '76px', textAlign: 'right' } }, ['0:00 / 0:00']);
+    var controls = h('div', { style: { display: 'flex', alignItems: 'center', gap: '14px', marginTop: '16px' } }, [samplesViz.playBtn, samplesViz.track, samplesViz.timeEl]);
+    stage.appendChild(controls);
+    stage.appendChild(h('div', { style: { textAlign: 'center', fontFamily: "'DM Sans'", fontStyle: 'italic', fontWeight: '400', fontSize: '19px', color: '#111111', marginTop: '14px' } }, ['“Put toy dinosaur on towel”']));
+
+    samplesViz.playing = false; svSyncIcon();
+    Promise.all([prime(samplesViz.cam), prime(samplesViz.plot)]).then(function () {
+      if (samplesViz.tab !== 'video') return;
+      samplesViz.ready = true;
+      svPlay();
+    });
+  }
+  function renderSamplesVizStatic(stage) {
+    stage.appendChild(h('img', { src: 'assets/images/steered_samples_viz.png',
+      alt: 'Action samples visualization: VLA (blue) action samples directed away from the task object or toward the distractor object, vs RL² steered (green) action samples directed toward the task object; the verifier-selected action is highlighted with a white backing',
+      style: { display: 'block', width: '100%', maxWidth: '760px', margin: '0 auto', height: 'auto', borderRadius: '8px' } }));
+    samplesViz.timer = setTimeout(function () { svGoTab('video'); }, SAMPLES_VIZ_STATIC_HOLD_MS);
+  }
+  var SAMPLES_VIZ_TABS = [['video', 'Video'], ['static', 'Static']];
+  function renderSamplesVizTabs() {
+    var tabs = $('samples-viz-tabs'); if (!tabs) return; clear(tabs);
+    SAMPLES_VIZ_TABS.forEach(function (t, i) {
+      var a = t[0] === samplesViz.tab;
+      tabs.appendChild(h('button', { 'aria-label': 'Show ' + t[1] + ' view', onClick: function () { if (t[0] !== samplesViz.tab) svGoTab(t[0]); },
+        style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 15px', border: 'none', borderRight: i < SAMPLES_VIZ_TABS.length - 1 ? '1px solid #111111' : 'none', background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111', whiteSpace: 'nowrap', transition: 'all .2s' } }, [t[1]]));
+    });
+  }
+  function renderSamplesViz() {
+    if (samplesViz.cam) { try { samplesViz.cam.pause(); } catch (e) {} }
+    if (samplesViz.plot) { try { samplesViz.plot.pause(); } catch (e) {} }
+    samplesViz.cam = null; samplesViz.plot = null; samplesViz.track = null; samplesViz.fill = null; samplesViz.timeEl = null; samplesViz.playBtn = null; samplesViz.playIcon = null; samplesViz.pauseIcon = null; samplesViz.playing = false; samplesViz.ready = false;
+    renderSamplesVizTabs();
+    var stage = $('samples-viz-stage'); if (!stage) return; clear(stage);
+    if (samplesViz.tab === 'video') renderSamplesVizVideo(stage); else renderSamplesVizStatic(stage);
+    requestAnimationFrame(function () { stage.style.opacity = '1'; });
+  }
+  function initSamplesViz() {
+    if (!$('samples-viz-stage')) return;
+    renderSamplesViz();
+    samplesViz.raf = requestAnimationFrame(svTick);
+  }
+
   /* ---------- bibtex ---------- */
   function initBibtex() {
     $('bibtex-pre').textContent = BIBTEX;
@@ -888,6 +983,7 @@
     $('arch-pause').addEventListener('click', archTogglePause);
     initBibtex();
     initDemo();
+    initSamplesViz();
     initObservers();
     initVideoGating();
     initScrollCues();
