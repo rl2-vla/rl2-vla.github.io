@@ -424,17 +424,31 @@
       galleryElapsed += dt;
       if (galleryElapsed >= galleryTurnMs()) {
         clearInterval(galleryTimer);
-        state.galleryTab = (state.galleryTab === 'ood_prompt') ? 'ood_env' : 'ood_prompt';
-        renderGallery();
+        galSwitchTab((state.galleryTab === 'ood_prompt') ? 'ood_env' : 'ood_prompt');
       }
     }, 250);
+  }
+  var GALLERY_FADE_MS = 320, galleryFadeTimer = null;
+  // Fades #gallery-grid out, swaps the tab, then fades back in — purely a wrapper around
+  // the existing renderGallery() rebuild, which is untouched and still runs synchronously.
+  function galSwitchTab(tab) {
+    clearTimeout(galleryFadeTimer);
+    clearInterval(galleryTimer);
+    var grid = $('gallery-grid');
+    if (!grid) { state.galleryTab = tab; renderGallery(); return; }
+    grid.style.opacity = '0';
+    galleryFadeTimer = setTimeout(function () {
+      state.galleryTab = tab;
+      renderGallery();
+      requestAnimationFrame(function () { grid.style.opacity = '1'; });
+    }, GALLERY_FADE_MS);
   }
   function renderGallery() {
     var tab = state.galleryTab;
     var tabs = $('gallery-tabs'); clear(tabs);
     [['ood_prompt', 'OOD Prompt'], ['ood_env', 'OOD Environment']].forEach(function (g, i) {
       var a = g[0] === tab;
-      tabs.appendChild(h('button', { onClick: function () { state.galleryTab = g[0]; renderGallery(); }, style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11.5px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 20px', border: 'none', borderRight: '1px solid ' + (i === 0 ? '#111111' : 'transparent'), background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111' } }, [g[1]]));
+      tabs.appendChild(h('button', { onClick: function () { galSwitchTab(g[0]); }, style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11.5px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 20px', border: 'none', borderRight: '1px solid ' + (i === 0 ? '#111111' : 'transparent'), background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111' } }, [g[1]]));
     });
     var fc = $('gallery-filters'); clear(fc);
     fc.appendChild(h('div', { style: { display: 'flex', alignItems: 'center', gap: '14px', fontFamily: "'Chakra Petch'", fontSize: '10.5px', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase', color: '#525252' } }));
