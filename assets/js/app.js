@@ -822,7 +822,11 @@
   var SAMPLES_VIZ_DIR = 'assets/Processed_Individual_vids/sim_dino_on_towel_OOD_ENV/action_chunk_viz/';
   var SAMPLES_VIZ_STATIC_HOLD_MS = 10000;
   var SAMPLES_VIZ_FADE_MS = 320;
-  var samplesViz = { tab: 'video', cam: null, plot: null, track: null, fill: null, timeEl: null, playBtn: null, playIcon: null, pauseIcon: null, playing: false, ready: false, raf: null, timer: null, fadeTimer: null };
+  var samplesViz = { tab: 'video', cam: null, plot: null, track: null, fill: null, timeEl: null, playBtn: null, playIcon: null, pauseIcon: null, playing: false, ready: false, raf: null, timer: null, fadeTimer: null, fig: null, inView: false, vc: 0 };
+  function svFigInView() { var fig = samplesViz.fig || (samplesViz.fig = $('samples-viz-stage')); return onScreen(fig, 0.3); }
+  // Scrolling back into the block starts it over from the video tab, frame one — same
+  // "re-enter = replay" behaviour as the gallery and the compositional-steering demo.
+  function svRestart() { svClearTimer(); clearTimeout(samplesViz.fadeTimer); samplesViz.tab = 'video'; renderSamplesViz(); }
   function svClearTimer() { if (samplesViz.timer) { clearTimeout(samplesViz.timer); samplesViz.timer = null; } }
   function svGoTab(tab, skipFade) {
     svClearTimer();
@@ -846,6 +850,12 @@
   }
   function svTick() {
     samplesViz.raf = requestAnimationFrame(svTick);
+    if ((samplesViz.vc = (samplesViz.vc + 1) % 6) === 0) {
+      var was = samplesViz.inView;
+      samplesViz.inView = svFigInView();
+      if (samplesViz.inView && !was) svRestart();
+      else if (!samplesViz.inView && was && samplesViz.playing) svPause();
+    }
     if (samplesViz.tab !== 'video' || !samplesViz.cam) return;
     var t = samplesViz.cam.currentTime || 0, dur = svDur();
     if (samplesViz.fill) samplesViz.fill.style.width = (dur ? Math.min(100, (t / dur) * 100) : 0) + '%';
@@ -910,6 +920,7 @@
   function initSamplesViz() {
     if (!$('samples-viz-stage')) return;
     renderSamplesViz();
+    samplesViz.inView = svFigInView();
     samplesViz.raf = requestAnimationFrame(svTick);
   }
 
