@@ -922,11 +922,17 @@
         style: { cursor: 'pointer', fontFamily: "'Chakra Petch'", fontSize: '11px', fontWeight: '500', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '9px 15px', border: 'none', borderRight: i < SAMPLES_VIZ_TABS.length - 1 ? '1px solid #111111' : 'none', background: a ? '#111111' : '#F9F9F7', color: a ? '#F9F9F7' : '#111111', whiteSpace: 'nowrap', transition: 'all .2s' } }, [t[1]]));
     });
   }
+  function renderSamplesVizLegend() {
+    var el = $('samples-viz-verifier-legend'); if (!el) return;
+    if (samplesViz.tab === 'video') { el.textContent = 'Verifier selection (red)'; el.style.color = '#C0392B'; }
+    else { el.textContent = 'Verifier selection (white backing)'; el.style.color = '#111111'; }
+  }
   function renderSamplesViz() {
     if (samplesViz.cam) { try { samplesViz.cam.pause(); } catch (e) {} }
     if (samplesViz.plot) { try { samplesViz.plot.pause(); } catch (e) {} }
     samplesViz.cam = null; samplesViz.plot = null; samplesViz.track = null; samplesViz.fill = null; samplesViz.timeEl = null; samplesViz.playBtn = null; samplesViz.playIcon = null; samplesViz.pauseIcon = null; samplesViz.playing = false; samplesViz.ready = false;
     renderSamplesVizTabs();
+    renderSamplesVizLegend();
     var stage = $('samples-viz-stage'); if (!stage) return; clear(stage);
     if (samplesViz.tab === 'video') renderSamplesVizVideo(stage); else renderSamplesVizStatic(stage);
     requestAnimationFrame(function () { stage.style.opacity = '1'; });
