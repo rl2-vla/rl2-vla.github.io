@@ -90,6 +90,7 @@
   var DEMO_EXAMPLES = [
     {
       id: 'real', eyebrow: 'Real robot · OOD environment', title: 'Put screwdriver in toolbox', tag: 'OOD Env',
+      failureModes: 'distracted by tape, imprecise grasping',
       layout: '2x2', blockAspect: '1440/1080',
       top: [
         { label: 'Rephrase', src: GVID + 'ood_env/real/screwdriver_in_toolbox/REPHRASE_Screwdriver_in_Toolbox_speedx5.mp4' },
@@ -106,6 +107,7 @@
     },
     {
       id: 'sim', eyebrow: 'Simulation · PolaRiS · OOD prompt', title: 'Pan cleaning', tag: 'OOD Prompt',
+      failureModes: 'repeatedly failed replanning',
       layout: '1+2', blockAspect: '1440/1080',
       top: [
         { label: 'Rephrase', src: GVID + 'ood_prompt/sim/pan_cleaning/REPHRASE_Pan_Cleaning_speedx3.mp4' }
@@ -742,6 +744,7 @@
 
     $('demo-ex-eyebrow').textContent = cfg.eyebrow;
     $('demo-ex-title').textContent = cfg.title;
+    $('demo-ex-caption').innerHTML = '<strong style="color:#111111">Failure modes:</strong> ' + cfg.failureModes;
     renderDemoTabs();
 
     var stage = demo.stage; clear(stage);
@@ -883,7 +886,7 @@
     ]);
     var plotWrap = h('div', { class: 'demo-block is-plot is-hero', style: { aspectRatio: '1440/1080' } }, [
       (samplesViz.plot = mkVideo(SAMPLES_VIZ_DIR + 'dino_on_towel_adaptive_compose_CP_slow.mp4', 'plot')),
-      h('div', { class: 'demo-tag' }, ['Conformal Prediction'])
+      h('div', { class: 'demo-tag' }, ['Failure Detection'])
     ]);
     var grid = h('div', { class: 'demo-grid' }, [camWrap, plotWrap]);
     stage.appendChild(grid);
