@@ -125,7 +125,7 @@
 
   var BIBTEX = '@article{tan2026rl2,\n  title   = {RL$^2$-VLA: Adaptive RL Latent Compositional Steering with Test-Time Scaling for Vision-Language-Action Models},\n  author  = {Derek Ming Siang Tan and Shailesh Shailesh and Srikrishna Iyer and William Wei Jie Teo and Yuanliang Ju and Qiao Gu and Guillaume Sartoretti},\n  year    = {2026},\n  journal = {arXiv preprint arXiv:2607.26991}\n}';
 
-  var TOC = [['overview', 'Overview'], ['abstract', 'Abstract'], ['demo', 'RL² in Action'], ['method', 'Method'], ['results', 'Results'], ['gallery', 'Task Gallery'], ['bibtex', 'BibTeX']];
+  var TOC = [['overview', 'Overview'], ['abstract', 'Abstract'], ['demo', 'RL² in Action'], ['method', 'Method'], ['results', 'Results'], ['gallery', 'Task Gallery'], ['conclusion', 'Limitations'], ['bibtex', 'BibTeX']];
   var BENCH_TABS = [['polaris_S', 'π₀.₅ · OOD Prompt'], ['pi0_indomain_ood_prompt', 'π₀ · OOD Prompt'], ['pi0_ood_env', 'π₀ · OOD Env'], ['openvla_indomain', 'OpenVLA · In-Domain'], ['real_indomain', 'Real · OOD Prompt'], ['real_ood', 'Real · OOD Env']];
 
   /* ---------- state ---------- */
