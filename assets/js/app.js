@@ -90,7 +90,7 @@
   var DEMO_EXAMPLES = [
     {
       id: 'real', eyebrow: 'Real robot · OOD environment', title: 'Put screwdriver in toolbox', tag: 'OOD Env',
-      failureModes: 'distracted by tape, imprecise grasping',
+      model: '&pi;<sub style="font-size:0.5em">0</sub>', failureModes: 'distracted by tape, imprecise grasping',
       layout: '2x2', blockAspect: '1440/1080',
       top: [
         { label: 'Rephrase', src: GVID + 'ood_env/real/screwdriver_in_toolbox/REPHRASE_Screwdriver_in_Toolbox_speedx5.mp4' },
@@ -107,7 +107,7 @@
     },
     {
       id: 'sim', eyebrow: 'Simulation · PolaRiS · OOD prompt', title: 'Pan cleaning', tag: 'OOD Prompt',
-      failureModes: 'repeatedly failed replanning',
+      model: '&pi;<sub style="font-size:0.5em">0.5</sub>', failureModes: 'repeatedly failed replanning',
       layout: '1+2', blockAspect: '1440/1080',
       top: [
         { label: 'Rephrase', src: GVID + 'ood_prompt/sim/pan_cleaning/REPHRASE_Pan_Cleaning_speedx3.mp4' }
@@ -744,7 +744,7 @@
 
     $('demo-ex-eyebrow').textContent = cfg.eyebrow;
     $('demo-ex-title').textContent = cfg.title;
-    $('demo-ex-caption').innerHTML = '<strong style="color:#111111">Failure modes:</strong> ' + cfg.failureModes;
+    $('demo-ex-caption').innerHTML = (cfg.model ? '<strong style="color:#111111;font-size:1.5em">' + cfg.model + '</strong> ' : '') + '<strong style="color:#111111">Failure modes:</strong> ' + cfg.failureModes;
     renderDemoTabs();
 
     var stage = demo.stage; clear(stage);
