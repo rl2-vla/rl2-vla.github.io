@@ -125,7 +125,23 @@ pre{margin:0}
   /* 2. overview metrics: wrap into a 2-2-1 vertical grid instead of squeezing 5 columns / scrolling */
   .metrics-grid{grid-template-columns:repeat(2,1fr)!important;overflow:visible!important}
   .metrics-grid>div:first-child{grid-column:1/-1;order:1;text-align:center}
+  .pi-sym{color:#737373!important}
 
   /* 3. poster figure: shrink the vertical padding on phones (desktop value is too large) */
   .fig1-box{padding:10px 0!important}
+
+  /* 4. poster zoom badge: icon-only circular button on phones (the full label covers too much of the image) */
+  .poster-zoom-badge{padding:8px!important;border-radius:50%!important;background:rgba(26,131,65,0.92)!important}
+  .poster-zoom-label{display:none!important}
+
+  /* 5. poster lightbox: the poster is very wide (2.16:1), so fitting it whole on a narrow phone
+     shrinks it down to a sliver. Instead zoom it in ~1.5x the fitted width and let it overflow
+     horizontally — starts scrolled to the left half, swipe right to see the rest. */
+  .poster-lightbox{padding:0!important;justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch}
+  .poster-lightbox img{max-width:none!important;max-height:none!important;width:150vw!important;height:auto!important;flex-shrink:0}
 }
+
+/* poster image lightbox: tap/click the overview figure to expand, click/tap away to close */
+.poster-lightbox{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:28px;background:rgba(10,10,10,0.88);opacity:0;visibility:hidden;transition:opacity .25s ease;cursor:zoom-out}
+.poster-lightbox.is-open{opacity:1;visibility:visible}
+.poster-lightbox img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,0.5);cursor:zoom-out}

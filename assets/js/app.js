@@ -1005,6 +1005,19 @@
     sec.appendChild(wrap);
   }
 
+  /* ---------- poster lightbox ---------- */
+  // Click/tap the overview poster to expand it full-screen; click/tap anywhere in the
+  // lightbox (backdrop or the enlarged image itself) to close it again.
+  function initPosterLightbox() {
+    var img = $('poster-img'), lb = $('poster-lightbox');
+    if (!img || !lb) return;
+    var open = function () { lb.classList.add('is-open'); };
+    var close = function () { lb.classList.remove('is-open'); };
+    img.addEventListener('click', open);
+    lb.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  }
+
   /* ---------- boot ---------- */
   function init() {
     TT.box = $('tooltip'); TT.title = $('tooltip-title'); TT.rows = $('tooltip-rows');
@@ -1022,6 +1035,7 @@
     initVideoGating();
     initScrollCues();
     initTooltipGuards();
+    initPosterLightbox();
   }
 
   /* ---------- tooltip guards ---------- */
