@@ -464,7 +464,7 @@
     var ins = $('gallery-insight'); clear(ins);
     ins.appendChild(h('div', { style: { margin: '26px 0 4px' } }, [
       h('div', { style: { fontFamily: "'Chakra Petch'", fontSize: '11px', fontWeight: '600', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#1A8341' } }, ['Key Insight']),
-      h('blockquote', { style: { position: 'relative', fontFamily: "'DM Sans'", fontStyle: 'italic', fontWeight: '500', fontSize: 'clamp(18px,2.3vw,24px)', lineHeight: '1.4', color: '#111111', margin: '14px 0 0', padding: '0 0 0 54px', maxWidth: '820px', textWrap: 'pretty' }, html: '<span aria-hidden="true" style="position:absolute;left:0;top:-14px;font-family:\'DM Sans\';font-style:italic;font-weight:700;font-size:74px;line-height:1;color:#1A8341">&ldquo;</span>' + INSIGHT[tab] })
+      h('blockquote', { 'class': 'key-insight-quote', style: { position: 'relative', fontFamily: "'DM Sans'", fontStyle: 'italic', fontWeight: '500', fontSize: 'clamp(18px,2.3vw,24px)', lineHeight: '1.4', color: '#111111', margin: '14px 0 0', padding: '0 0 0 54px', maxWidth: '820px', textWrap: 'pretty' }, html: '<span aria-hidden="true" style="position:absolute;left:0;top:-14px;font-family:\'DM Sans\';font-style:italic;font-weight:700;font-size:74px;line-height:1;color:#1A8341">&ldquo;</span>' + INSIGHT[tab] })
     ]));
 
     if (galleryIO) { galleryIO.disconnect(); }

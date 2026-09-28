@@ -101,7 +101,7 @@
 <section id="abstract" data-sec="abstract" class="rev" style="position:relative;padding:72px 0">
   <div aria-hidden="true" style="position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);background:#EFF2F2;z-index:-1"></div>
   <div style="margin-bottom:14px"><div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#1A8341">Abstract</div></div>
-  <p style="font-family:'DM Sans';font-size:18px;line-height:1.68;color:#222222;margin:0;text-wrap:pretty">
+  <p class="fs18" style="font-family:'DM Sans';font-size:18px;line-height:1.68;color:#222222;margin:0;text-wrap:pretty">
     <!-- Despite the impressive visuomotor capabilities of Vision-Language-Action (VLA) models, their performance often degrades on challenging and out-of-domain tasks. We introduce <span style="color:#1A8341;font-weight:600">RL<sup>2</sup></span>, an adaptive inference-time steering framework that leverages Reinforcement Learning on VLA Latents. We train a lightweight offline RL flow-matching policy conditioned on expressive latents from the VLA action expert, and <span style="color:#111111;font-weight:600">steers the base VLA by composing their action expert flow velocities</span> during inference. We further discover that inference-time steering follows fundamentally different scaling laws under success and failure states &mdash; <span style="color:#111111;font-weight:600">action diversity is most beneficial when the base VLA is likely to fail</span> &mdash; so RL<sup>2</sup> activates compositional steering only when failure is predicted. Across the SIMPLER and PolaRiS benchmarks, RL<sup>2</sup> improves success rates by up to <span style="color:#1A8341;font-weight:600">+17.3%</span>, and real-world experiments confirm the gains transfer beyond simulation. -->
     Despite the impressive visuomotor capabilities of Vision-Language-Action (VLA) models, their performance often degrades on challenging and out-of-domain tasks. We introduce <span style="color:#1A8341;font-weight:600">RL<sup>2</sup></span>, an adaptive inference-time steering framework that leverages <strong style="color:#1A8341;text-decoration:underline;font-weight:700;font-size:1.15em">R</strong>einforcement <strong style="color:#1A8341;text-decoration:underline;font-weight:700;font-size:1.15em">L</strong>earning on VLA <strong style="color:#1A8341;text-decoration:underline;font-weight:700;font-size:1.15em">L</strong>atents. We train a lightweight offline RL flow-matching policy conditioned on expressive latents from the VLA action expert, and <span style="color:#111111;font-weight:600">steers the base VLA by composing their action expert flow velocities</span> during inference. We further discover that inference-time steering follows <strong style="color:#1A8341;font-weight:700">fundamentally different scaling laws under success and failure</strong> &mdash; <span style="color:#111111;font-weight:600">action diversity is most beneficial when the base VLA is likely to fail</span> &mdash; RL<sup>2</sup> therefore activates compositional steering only when failure is predicted.
   </p>
@@ -114,7 +114,7 @@
     <h2 style="font-family:'DM Sans';font-weight:700;font-size:clamp(24px,3vw,33px);letter-spacing:-0.01em;line-height:1.14;margin:6px 0 0;color:#111111">Adaptive RL Compositional Steering</h2>
   </div>
   <!-- <p style="font-family:'DM Sans';font-size:18px;line-height:1.7;color:#404040;max-width:720px;margin:15px 0 0">Watch the baselines struggle, then RL<sup>2</sup> take over. The <strong style="color:#111111">failure&#8209;detection</strong> panel shows exactly when the conformal (CP) band is crossed and compositional steering kicks in &mdash; step through the numbered keypoints to follow the closed loop.</p> -->
-  <p style="font-family:'DM Sans';font-size:18px;line-height:1.7;color:#404040;max-width:720px;margin:15px 0 0">Baselines struggle while RL<sup>2</sup> succeeds via adaptive steering. The <strong style="color:#111111">Failure Detection</strong> panel shows when the failure probability crosses the <strong style="color:#111111">Conformal Prediction (CP)</strong> band and applies compositional steering (click on numbered keypoints for explanations).</p>
+  <p class="fs18" style="font-family:'DM Sans';font-size:18px;line-height:1.7;color:#404040;max-width:720px;margin:15px 0 0">Baselines struggle while RL<sup>2</sup> succeeds via adaptive steering. The <strong style="color:#111111">Failure Detection</strong> panel shows when the failure probability crosses the <strong style="color:#111111">Conformal Prediction (CP)</strong> band and applies compositional steering (click on numbered keypoints for explanations).</p>
 
   <figure style="margin:26px 0 0" data-demo-fig>
     <div style="background:#F9F9F7;border:1px solid #111111;border-radius:16px;padding:18px 18px 20px">
@@ -191,7 +191,7 @@
   </div>
   <div style="margin:22px 0 0">
     <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#1A8341">Key Insight</div>
-    <blockquote style="position:relative;font-family:'DM Sans';font-style:italic;font-weight:500;font-size:clamp(20px,2.6vw,27px);line-height:1.38;color:#111111;margin:14px 0 0;padding:0 0 0 54px;max-width:820px;text-wrap:pretty"><span aria-hidden="true" style="position:absolute;left:0;top:-14px;font-family:'DM Sans';font-style:italic;font-weight:700;font-size:74px;line-height:1;color:#1A8341">&ldquo;</span>Diversification is most useful during failure <span style="font-style:normal;font-size:0.75em;color:#525252">(e.g. RL<sup>2</sup>, RBF)</span>, but may degrade already-accurate actions during success.</blockquote>
+    <blockquote class="key-insight-quote" style="position:relative;font-family:'DM Sans';font-style:italic;font-weight:500;font-size:clamp(20px,2.6vw,27px);line-height:1.38;color:#111111;margin:14px 0 0;padding:0 0 0 54px;max-width:820px;text-wrap:pretty"><span aria-hidden="true" style="position:absolute;left:0;top:-14px;font-family:'DM Sans';font-style:italic;font-weight:700;font-size:74px;line-height:1;color:#1A8341">&ldquo;</span>Diversification is most useful during failure <span style="font-style:normal;font-size:0.75em;color:#525252">(e.g. RL<sup>2</sup>, RBF)</span>, but may degrade already-accurate actions during success.</blockquote>
 
     <div style="margin-top:16px">
       <div style="background:#F9F9F7;border:1px solid #111111;border-radius:12px;padding:20px 20px 16px">
@@ -230,7 +230,7 @@
 
   <div style="margin-top:44px">
     <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#1A8341">Key Insight</div>
-    <blockquote style="position:relative;font-family:'DM Sans';font-style:italic;font-weight:500;font-size:clamp(20px,2.6vw,27px);line-height:1.38;color:#111111;margin:14px 0 0;padding:0 0 0 54px;max-width:820px;text-wrap:pretty"><span aria-hidden="true" style="position:absolute;left:0;top:-14px;font-family:'DM Sans';font-style:italic;font-weight:700;font-size:74px;line-height:1;color:#1A8341">&ldquo;</span>On OOD prompts and environments, adaptive RL<sup>2</sup> achieves up to <span style="font-style:normal;color:#1A8341;font-weight:700">+17.3%</span> in simulation and <span style="font-style:normal;color:#1A8341;font-weight:700">+26.7%</span> on-robot, over the strongest Rephrase baseline.
+    <blockquote class="key-insight-quote" style="position:relative;font-family:'DM Sans';font-style:italic;font-weight:500;font-size:clamp(20px,2.6vw,27px);line-height:1.38;color:#111111;margin:14px 0 0;padding:0 0 0 54px;max-width:820px;text-wrap:pretty"><span aria-hidden="true" style="position:absolute;left:0;top:-14px;font-family:'DM Sans';font-style:italic;font-weight:700;font-size:74px;line-height:1;color:#1A8341">&ldquo;</span>On OOD prompts and environments, adaptive RL<sup>2</sup> achieves up to <span style="font-style:normal;color:#1A8341;font-weight:700">+17.3%</span> in simulation and <span style="font-style:normal;color:#1A8341;font-weight:700">+26.7%</span> on-robot, over the strongest Rephrase baseline.
       <!-- ; on hardware it beats the Rephrase baseline by <span style="font-style:normal;color:#1A8341;font-weight:700">+17.5%</span> on average. -->
     </blockquote>
   </div>
@@ -277,7 +277,7 @@
     <div style="font-family:'Chakra Petch';font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#1A8341">Conclusion</div>
     <h2 style="font-family:'DM Sans';font-weight:700;font-size:clamp(24px,3vw,33px);letter-spacing:-0.01em;line-height:1.14;margin:6px 0 0;color:#111111">Adaptive steering as a path to robust VLAs</h2>
   </div>
-  <p style="font-family:'DM Sans';font-size:16.5px;line-height:1.75;color:#404040;max-width:820px;margin:16px 0 0;text-wrap:pretty">
+  <p class="fs165" style="font-family:'DM Sans';font-size:16.5px;line-height:1.75;color:#404040;max-width:820px;margin:16px 0 0;text-wrap:pretty">
     We present <span style="color:#1A8341;font-weight:600">RL<sup>2</sup></span>, an inference-time steering framework that composes a lightweight RL policy &mdash; trained on VLA latents from the same offline finetuning data &mdash; with the base VLA to diversify actions beyond demonstration modes. We uncover <strong style="color:#1A8341;font-weight:700">distinct test-time scaling laws under success and failure</strong>, showing that compositional steering helps most precisely when the base policy is likely to fail, and validate RL<sup>2</sup> as a modular framework across VLAs, verifiers, and manipulation benchmarks, both in-domain and out-of-distribution, <strong style="color:#111111;font-weight:700">achieving up to +17.3% higher success rates</strong> over the strongest baseline. Together, these results position adaptive test-time steering as a practical path toward robust, general-purpose robotics foundation models.
   </p>
 
@@ -285,16 +285,16 @@
     <div style="font-family:'DM Sans';font-weight:700;font-size:20px;letter-spacing:-0.01em;text-transform:none;color:#111111;border-bottom:1px solid #111111;padding-bottom:10px">Limitations and Future Work</div>
     <div style="display:grid;grid-template-columns:1fr;gap:14px;margin-top:18px">
       <div style="background:#F9F9F7;border:1px solid #E2E2DC;border-radius:12px;padding:18px 20px">
-        <div style="font-family:'DM Sans';font-weight:700;font-size:18px;color:#1A8341">Steering Function</div>
-        <p style="font-family:'DM Sans';font-size:16px;line-height:1.68;color:#404040;margin:6px 0 0;text-align:justify;hyphens:auto">RL<sup>2</sup> targets minimal inference overhead using lightweight steering models. Future work will benchmark against differentiable steering from larger models (i.e. VLMs, or other VLAs).</p>
+        <div class="fs18" style="font-family:'DM Sans';font-weight:700;font-size:18px;color:#1A8341">Steering Function</div>
+        <p style="font-family:'DM Sans';font-size:15px;line-height:1.68;color:#404040;margin:6px 0 0;text-align:left">RL<sup>2</sup> targets minimal inference overhead using lightweight steering models. Future work will benchmark against differentiable steering from larger models (i.e. VLMs, or other VLAs).</p>
       </div>
       <div style="background:#F9F9F7;border:1px solid #E2E2DC;border-radius:12px;padding:18px 20px">
-        <div style="font-family:'DM Sans';font-weight:700;font-size:18px;color:#1A8341">Failure Detection</div>
-        <p style="font-family:'DM Sans';font-size:16.5px;line-height:1.68;color:#404040;margin:6px 0 0;text-align:justify;hyphens:auto">Our failure-detection module currently requires online rollout collection for training. Future work will move to large-scale offline data to improve generalization without further data collection.</p>
+        <div class="fs18" style="font-family:'DM Sans';font-weight:700;font-size:18px;color:#1A8341">Failure Detection</div>
+        <p style="font-family:'DM Sans';font-size:15px;line-height:1.68;color:#404040;margin:6px 0 0;text-align:left">Our failure-detection module currently requires online rollout collection for training. Future work will move to large-scale offline data to improve generalization without further data collection.</p>
       </div>
       <div style="background:#F9F9F7;border:1px solid #E2E2DC;border-radius:12px;padding:18px 20px">
-        <div style="font-family:'DM Sans';font-weight:700;font-size:18px;color:#1A8341">Verifier</div>
-        <p style="font-family:'DM Sans';font-size:16px;line-height:1.68;color:#404040;margin:6px 0 0;text-align:justify;hyphens:auto">RL<sup>2</sup> assumes a verifier that reliably selects among candidate actions. Future work will relax this by co-training the RL steering policy with the verifier to make action selection more robust.</p>
+        <div class="fs18" style="font-family:'DM Sans';font-weight:700;font-size:18px;color:#1A8341">Verifier</div>
+        <p style="font-family:'DM Sans';font-size:15px;line-height:1.68;color:#404040;margin:6px 0 0;text-align:left">RL<sup>2</sup> assumes a verifier that reliably selects among candidate actions. Future work will relax this by co-training the RL steering policy with the verifier to make action selection more robust.</p>
       </div>
     </div>
   </div>

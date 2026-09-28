@@ -111,6 +111,9 @@ pre{margin:0}
 
 /* ============ mobile (<=760px) ============ */
 @media (max-width:760px){
+  .fs18,.fs165{font-size:15px!important}
+  .key-insight-quote{font-size:18px!important}
+
   /* 1 + 5. header: keep the RL²-VLA logo on one line and surface the section menu as a scrollable bar */
   header > div{padding:0 14px!important;gap:10px!important}
   .site-logo{white-space:nowrap;font-size:17px!important}
