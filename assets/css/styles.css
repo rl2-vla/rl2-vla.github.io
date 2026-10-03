@@ -128,6 +128,7 @@ pre{margin:0}
   /* 2. overview metrics: wrap into a 2-2-1 vertical grid instead of squeezing 5 columns / scrolling */
   .metrics-grid{grid-template-columns:repeat(2,1fr)!important;overflow:visible!important}
   .metrics-grid>div:first-child{grid-column:1/-1;order:1;text-align:center}
+  .metric-num{font-size:clamp(20px,2.5vw,28px)!important}
   .pi-sym{color:#737373!important}
 
   /* 3. poster figure: shrink the vertical padding on phones (desktop value is too large) */
